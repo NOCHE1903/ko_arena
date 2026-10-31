@@ -1,0 +1,478 @@
+HTML
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KO ARENA - Knight Online Topluluk & Pazar Forumu</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-main: #0b0c10;
+            --bg-card: #15181e;
+            --bg-hover: #1f242d;
+            --primary-red: #e63946;
+            --primary-gold: #d4af37;
+            --text-light: #e0e6ed;
+            --text-muted: #94a3b8;
+            --border-color: #2a2f3a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        /* HEADER & TÜRK BAYRAĞI */
+        header {
+            background: linear-gradient(180deg, rgba(15,17,21,0.95) 0%, rgba(11,12,16,1) 100%),
+                        url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=1200&q=80') center/cover;
+            border-bottom: 2px solid var(--primary-gold);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .flag-icon {
+            width: 42px;
+            height: 28px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(230, 57, 70, 0.6);
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .user-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1f242d 0%, #15181e 100%);
+            color: var(--primary-gold);
+            border: 1px solid var(--primary-gold);
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-gold);
+            color: #000;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-red {
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+        .btn-red:hover {
+            background: var(--primary-red);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(230, 57, 70, 0.5);
+        }
+
+        /* REKLAM BANNER */
+        .ad-banner {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 15px;
+            background: linear-gradient(90deg, #1c1917 0%, #292524 50%, #1c1917 100%);
+            border: 1px dashed var(--primary-gold);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--primary-gold);
+            font-weight: 700;
+        }
+
+        /* ANA DÜZEN */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+        }
+
+        /* SEKME/TAB YAPISI */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            color: var(--primary-gold);
+            border-bottom-color: var(--primary-gold);
+        }
+
+        /* FORUM & KART YAPISI */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        .forum-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .forum-card:hover {
+            transform: translateX(4px);
+            border-color: var(--primary-gold);
+        }
+
+        .card-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-icon {
+            font-size: 1.6rem;
+            color: var(--primary-gold);
+            width: 40px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background-color: #2a2f3a;
+            color: var(--primary-gold);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        /* FILTRELEME */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .select-input {
+            background-color: var(--bg-card);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        /* SIDEBAR (SAĞ PANEL) */
+        .sidebar-widget {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .widget-title {
+            font-family: 'Cinzel', serif;
+            color: var(--primary-gold);
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .streamer-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-red);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--primary-red);
+        }
+
+        /* ÇARK ÇEKİLİŞ ALANI */
+        .wheel-box {
+            text-align: center;
+        }
+
+        #nameInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 6px;
+        }
+
+        .wheel-display {
+            width: 160px;
+            height: 160px;
+            border: 4px solid var(--primary-gold);
+            border-radius: 50%;
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--primary-gold);
+            background: radial-gradient(circle, #1f242d 0%, #0b0c10 100%);
+            transition: transform 3s cubic-bezier(0.15, 0.9, 0.15, 1);
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg" alt="Türkiye" class="flag-icon">
+            <h1 class="logo-text">KO ARENA</h1>
+        </div>
+        <div class="user-nav">
+            <button class="btn"><i class="fa-solid fa-user"></i> Giriş Yap</button>
+            <button class="btn btn-red"><i class="fa-solid fa-user-plus"></i> Kayıt Ol</button>
+        </div>
+    </header>
+
+    <!-- SPONSOR/PAZARCI REKLAM BANNER -->
+    <div class="ad-banner">
+        <i class="fa-solid fa-crown"></i> PAZARCI ÖZEL REKLAM ALANI - GB VE İTEM İLANLARINIZ İÇİN BİZE ULAŞIN <i class="fa-solid fa-crown"></i>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="main-container">
+        
+        <!-- İÇERİK ALANI -->
+        <main>
+            <div class="tab-menu">
+                <button class="tab-btn active" onclick="openTab('pazar')"><i class="fa-solid fa-store"></i> Pazar & Karakter</button>
+                <button class="tab-btn" onclick="openTab('tartisma')"><i class="fa-solid fa-comments"></i> Genel Tartışma</button>
+                <button class="tab-btn" onclick="openTab('guncelleme')"><i class="fa-solid fa-scroll"></i> Güncelleme Notları</button>
+                <button class="tab-btn" onclick="openTab('farm')"><i class="fa-solid fa-shield-halved"></i> Farm Slotları</button>
+            </div>
+
+            <!-- PAZAR & KARAKTER SEKMESİ -->
+            <div id="pazar" class="tab-content active">
+                <div class="filter-bar">
+                    <select class="select-input" id="serverFilter">
+                        <option value="all">Tüm Sunucular (Server)</option>
+                        <option value="zero">Zero</option>
+                        <option value="pandora">Pandora</option>
+                        <option value="agartha">Agartha</option>
+                        <option value="felis">Felis</option>
+                        <option value="ares">Ares / Diez</option>
+                    </select>
+                    <select class="select-input" id="typeFilter">
+                        <option value="all">Tüm İlan Tipleri</option>
+                        <option value="item">İtem Satış</option>
+                        <option value="char">Karakter / Ring</option>
+                    </select>
+                </div>
+
+                <div class="forum-card">
+                    <div class="card-info">
+                        <i class="fa-solid fa-wand-magic-sparkles card-icon"></i>
+                        <div>
+                            <div class="card-title">+9 Shard & +8 Mythril Set (Zero)</div>
+                            <div class="card-desc">Satıcı: ShadowWarrior | PM: 9ShardKing</div>
+                        </div>
+                    </div>
+                    <span class="badge">ZERO - İTEM</span>
+                </div>
+
+                <div class="forum-card">
+                    <div class="card-info">
+                        <i class="fa-solid fa-user-ninja card-icon"></i>
+                        <div>
+                            <div class="card-title">83/5 Full PK Rogue Character Ring (Agartha)</div>
+                            <div class="card-desc">Satıcı: ElMoradNinja | %100 Rebirth</div>
+                        </div>
+                    </div>
+                    <span class="badge">AGARTHA - CHAR</span>
+                </div>
+            </div>
+
+            <!-- GENEL TARTIŞMA SEKMESİ -->
+            <div id="tartisma" class="tab-content">
+                <div class="forum-card">
+                    <div class="card-info">
+                        <i class="fa-solid fa-fire card-icon"></i>
+                        <div>
+                            <div class="card-title">Yeni Sunucu Geliyor mu? İddialar ve Tartışmalar</div>
+                            <div class="card-desc">Başlatan: KnightPro | 142 Yorum</div>
+                        </div>
+                    </div>
+                    <span class="badge">POLEMİK</span>
+                </div>
+            </div>
+
+            <!-- GÜNCELLEME NOTLARI SEKMESİ -->
+            <div id="guncelleme" class="tab-content">
+                <div class="forum-card">
+                    <div class="card-info">
+                        <i class="fa-solid fa-bullhorn card-icon"></i>
+                        <div>
+                            <div class="card-title">2026 Sunucu Bakımı ve Etkinlik Güncellemesi</div>
+                            <div class="card-desc">Yayınlandı: KO ARENA Yöneticisi</div>
+                        </div>
+                    </div>
+                    <span class="badge">RESMİ</span>
+                </div>
+            </div>
+
+            <!-- FARM SLOTLARI SEKMESİ -->
+            <div id="farm" class="tab-content">
+                <div class="forum-card">
+                    <div class="card-info">
+                        <i class="fa-solid fa-coins card-icon"></i>
+                        <div>
+                            <div class="card-title">CZ Aoc & Dark Knight Drop Saatlik Kazanç Analizi</div>
+                            <div class="card-desc">Yazan: SlotMaster | Güncel Drops</div>
+                        </div>
+                    </div>
+                    <span class="badge">REHBER</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- SIDEBAR (SAĞ PANEL) -->
+        <aside>
+            <!-- TWITCH YAYINCILARI -->
+            <div class="sidebar-widget">
+                <div class="widget-title"><i class="fa-brands fa-twitch"></i> Twitch Canlı Yayıncılar</div>
+                <div class="streamer-item">
+                    <span><span class="live-dot"></span> KO_Legendary</span>
+                    <a href="#" style="color:var(--primary-gold); text-decoration:none; font-size:0.8rem;">İzle</a>
+                </div>
+                <div class="streamer-item">
+                    <span><span class="live-dot"></span> CZ_PK_King</span>
+                    <a href="#" style="color:var(--primary-gold); text-decoration:none; font-size:0.8rem;">İzle</a>
+                </div>
+            </div>
+
+            <!-- ÇARK ÇEKİLİŞ SİSTEMİ -->
+            <div class="sidebar-widget wheel-box">
+                <div class="widget-title"><i class="fa-solid fa-dharmachakra"></i> Canlı Çark Çekilişi</div>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">İsimleri virgülle ayırarak yazın:</p>
+                <input type="text" id="nameInput" placeholder="Ahmet, Mehmet, Ali...">
+                <div class="wheel-display" id="wheelDisplay">KO ARENA</div>
+                <button class="btn" onclick="spinWheel()" style="width:100%;"><i class="fa-solid fa-play"></i> Çarkı Döndür</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- JAVASCRIPT KODLARI -->
+    <script>
+        // TAB DEĞİŞTİRME
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // ÇARK ÇEKİLİŞ SİSTEMİ
+        function spinWheel() {
+            const input = document.getElementById('nameInput').value;
+            const display = document.getElementById('wheelDisplay');
+            
+            if(!input.trim()) {
+                alert("Lütfen en az bir isim girin!");
+                return;
+            }
+
+            const names = input.split(',').map(n => n.trim()).filter(n => n);
+            display.style.transform = `rotate(${360 * 5 + Math.floor(Math.random() * 360)}deg)`;
+            
+            setTimeout(() => {
+                const winner = names[Math.floor(Math.random() * names.length)];
+                display.style.transform = 'rotate(0deg)';
+                display.innerText = "🏆 " + winner;
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
