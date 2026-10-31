@@ -781,7 +781,25 @@ function koPost(id,content){const post=document.createElement('div');post.classN
 async function koCategories(){const {data,error}=await client.from('categories').select('*').limit(100);if(error){console.warn('Kategoriler:',error.message);koCategoryMap=[];return [];}koCategoryMap=data||[];return koCategoryMap;}
 function koCategoryMatch(label){const normalize=x=>String(x||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]/g,'');const a=normalize(label);return koCategoryMap.find(c=>normalize(c.name||c.title)===a)||koCategoryMap.find(c=>normalize(c.name||c.title).includes(a)||a.includes(normalize(c.name||c.title)));}
 
-function koSetForumView(view){const sec=document.getElementById('forumSec');sec.classList.toggle('ko-category-page',view==='category');sec.classList.toggle('ko-topic-page',view==='topic');if(view!=='topic')el('koInlineTopic').replaceChildren();window.scrollTo(0,0);}
+function koSetForumView(view){
+  const sec=document.getElementById('forumSec');
+  if(!sec)return;
+  sec.classList.toggle('ko-category-page',view==='category');
+  sec.classList.toggle('ko-topic-page',view==='topic');
+  const home=document.getElementById('koCategoryHome');
+  const results=document.getElementById('forumResults');
+  const crumb=document.getElementById('forumBreadcrumb');
+  const topic=document.getElementById('koInlineTopic');
+  const tabs=sec.querySelector('.sub-nav-tabs');
+  const hero=sec.querySelector('.hero-banner-portal');
+  const ad=sec.querySelector('.ko-ad-wrap');
+  const onHome=view==='home';
+  [home,tabs,hero,ad].forEach(node=>{if(node)node.style.setProperty('display',onHome?'':'none',onHome?'':'important');});
+  if(results)results.style.setProperty('display',view==='topic'?'none':'block','important');
+  if(crumb)crumb.style.setProperty('display',view==='category'?'flex':'none','important');
+  if(topic){topic.style.setProperty('display',view==='topic'?'block':'none','important');if(view!=='topic')topic.replaceChildren();}
+  window.scrollTo(0,0);
+}
 function koGoHome(){koSelectedCategory=null;koSetForumView('home');switchSection('forumSec');history.pushState({koView:'home'},'',location.pathname+location.search+'#forum');document.querySelectorAll('.forum-category-row').forEach(r=>r.classList.remove('selected'));loadTopics();}
 async function koOpenCategory(label){switchSection('forumSec');await koCategories();const cat=koCategoryMatch(label);if(!cat){alert('Kategori veritabanında bulunamadı: '+label);return;}koSelectedCategory={id:cat.id,name:cat.name||cat.title};koSetForumView('category');history.pushState({koView:'category',label},'','#kategori-'+encodeURIComponent(label));document.querySelectorAll('.forum-category-row').forEach(r=>r.classList.toggle('selected',r.querySelector('strong')?.textContent===label));await loadTopics();}
 function koInitCategories(){document.querySelectorAll('.forum-category-row').forEach(row=>{const label=row.querySelector('strong')?.textContent?.trim();if(!label)return;row.setAttribute('role','button');row.tabIndex=0;row.onclick=()=>koOpenCategory(label);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();koOpenCategory(label);}};});}
