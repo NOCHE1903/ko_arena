@@ -612,29 +612,16 @@
                     </select>
                 </div>
 
-                <div id="pazarListesi">
-                    <div class="forum-card-box pazar-item" data-server="zero" data-type="item">
-                        <div class="card-main-info">
-                            <i class="fa-solid fa-wand-magic-sparkles card-icon"></i>
-                            <div>
-                                <div class="card-title">+9 Shard & Dual Coc Sat&#305;l&#305;k (Zero Server)</div>
-                                <div class="card-desc">Sat&#305;c&#305;: NocheWarrior | &#304;leti&#351;im PM: 9ShardKing</div>
-                            </div>
-                        </div>
-                        <span style="color:var(--primary-gold); font-size:0.75rem; font-weight:700; border:1px solid var(--primary-gold); padding:3px 8px; border-radius:4px;">ZERO - &#304;TEM</span>
-                    </div>
-
-                    <div class="forum-card-box pazar-item" data-server="agartha" data-type="char">
-                        <div class="card-main-info">
-                            <i class="fa-solid fa-user-ninja card-icon"></i>
-                            <div>
-                                <div class="card-title">83 Level %100 Rebirth Rogue Character Ring (Agartha)</div>
-                                <div class="card-desc">Sat&#305;c&#305;: ElMoradKing | Full Skill & Quest A&#231;&#305;kt&#305;r</div>
-                            </div>
-                        </div>
-                        <span style="color:var(--primary-gold); font-size:0.75rem; font-weight:700; border:1px solid var(--primary-gold); padding:3px 8px; border-radius:4px;">AGARTHA - CHAR</span>
-                    </div>
-                </div>
+                <div class="panel-box" style="margin-bottom:16px"><div class="panel-header"><i class="fa-solid fa-circle-plus"></i> Yeni Pazar Ä°lanÄ± AÃ§</div>
+                  <div class="panel-body"><form id="koMarketForm" style="display:grid;gap:10px">
+                    <input id="koMarketTitle" required maxlength="120" placeholder="Ä°lan baÅŸlÄ±ÄŸÄ± (Ã¶r. Pandora +8 Shard)" class="wheel-input">
+                    <div class="filter-grid" style="margin:0"><select id="koMarketServer" class="filter-select" required><option value="">Sunucu seÃ§</option><option value="zero">Zero</option><option value="agartha">Agartha</option><option value="pandora">Pandora</option><option value="other">DiÄŸer sunucu</option></select><select id="koMarketType" class="filter-select" required><option value="item">Ä°tem / GB</option><option value="char">Karakter / Ring</option></select></div>
+                    <input id="koMarketPrice" class="wheel-input" type="number" min="0" step="0.01" placeholder="Fiyat (TL)" required>
+                    <textarea id="koMarketDescription" class="wheel-input" rows="4" required maxlength="2000" placeholder="Ä°lan aÃ§Ä±klamasÄ± ve oyun iÃ§i iletiÅŸim bilgisi"></textarea>
+                    <button class="btn" type="submit">Ä°lanÄ± YayÄ±nla</button><p id="koMarketStatus" role="status" style="color:#f2d391"></p>
+                  </form></div></div>
+                <p id="koMarketLoadStatus" role="status" style="padding:5px 0 12px;color:#c5b99d"></p>
+                <div id="pazarListesi"></div>
             </div>
 
             <!-- 3. &#199;ARK & ETK&#304;NL&#304;K B&#214;L&#220;M&#220; -->
@@ -1070,6 +1057,44 @@ const message=document.getElementById('koAuthMessage');
 let signup=false;
 const client=window.supabase?.createClient(url,key);
 window.koSupabase=client;
+// Pazar ilanlarÄ± Supabase Ã¼zerinde saklanÄ±r; giriÅŸ yapmadan ilan eklenemez.
+const marketForm=document.getElementById('koMarketForm');
+const marketStatus=document.getElementById('koMarketStatus');
+const marketList=document.getElementById('pazarListesi');
+const marketLoadStatus=document.getElementById('koMarketLoadStatus');
+async function koLoadMarket(){
+ if(!client)return;
+ marketLoadStatus.textContent='Ä°lanlar yÃ¼kleniyor...';
+ const {data,error}=await client.from('ko_market_ads').select('id,user_id,title,description,server,item_type,price,created_at').order('created_at',{ascending:false}).limit(100);
+ marketList.replaceChildren();
+ if(error){marketLoadStatus.textContent='Ä°lanlar yÃ¼klenemedi. Ã–nce verilen pazar SQL kurulumunu Ã§alÄ±ÅŸtÄ±r: '+error.message;return;}
+ marketLoadStatus.textContent=data.length?'':'HenÃ¼z ilan yok. Ä°lk ilanÄ± sen aÃ§abilirsin.';
+ let user=null;try{({data:{user}}=await client.auth.getUser());}catch(e){}
+ for(const ad of data){
+  const card=document.createElement('div');card.className='forum-card-box pazar-item';card.dataset.server=ad.server;card.dataset.type=ad.item_type;
+  const main=document.createElement('div');main.className='card-main-info';
+  const icon=document.createElement('i');icon.className='fa-solid fa-tags card-icon';
+  const content=document.createElement('div');const title=document.createElement('div');title.className='card-title';title.textContent=ad.title;
+  const desc=document.createElement('div');desc.className='card-desc';desc.style.whiteSpace='pre-wrap';desc.textContent=ad.description;
+  const price=document.createElement('div');price.style.color='#f2d391';price.style.marginTop='6px';price.textContent=Number(ad.price).toLocaleString('tr-TR')+' TL Â· '+ad.server.toUpperCase();
+  content.append(title,desc,price);main.append(icon,content);card.append(main);
+  if(user&&user.id===ad.user_id){const del=document.createElement('button');del.type='button';del.className='btn btn-red';del.textContent='Ä°lanÄ± Sil';del.onclick=async()=>{if(!confirm('Ä°lanÄ± silmek istiyor musun?'))return;const {error}=await client.from('ko_market_ads').delete().eq('id',ad.id);if(error)alert('Ä°lan silinemedi: '+error.message);else koLoadMarket();};card.append(del);}
+  marketList.append(card);
+ }
+ filterPazar();
+}
+marketForm.addEventListener('submit',async e=>{
+ e.preventDefault();if(!client){marketStatus.textContent='VeritabanÄ± baÄŸlantÄ±sÄ± yok.';return;}
+ const {data:{user},error:authError}=await client.auth.getUser();
+ if(authError||!user){marketStatus.textContent='Ä°lan aÃ§mak iÃ§in Ã¶nce giriÅŸ yap.';window.koOpenAuth?.(false);return;}
+ const submit=marketForm.querySelector('[type=submit]');submit.disabled=true;marketStatus.textContent='Ä°lan kaydediliyor...';
+ const payload={user_id:user.id,title:document.getElementById('koMarketTitle').value.trim(),server:document.getElementById('koMarketServer').value,item_type:document.getElementById('koMarketType').value,price:Number(document.getElementById('koMarketPrice').value),description:document.getElementById('koMarketDescription').value.trim()};
+ const {error}=await client.from('ko_market_ads').insert(payload);
+ submit.disabled=false;if(error){marketStatus.textContent='Ä°lan kaydedilemedi: '+error.message;return;}
+ marketForm.reset();marketStatus.textContent='Ä°lanÄ±n yayÄ±nlandÄ±.';await koLoadMarket();
+});
+koLoadMarket();
+
 window.koOpenAuth=function(mode){signup=!!mode;document.getElementById('koAuthHeading').textContent=signup?'Kay\u0131t Ol':'Giri\u015f Yap';document.getElementById('koUsernameWrap').hidden=!signup;document.getElementById('koUsername').required=signup;document.getElementById('koAuthSubmit').textContent=signup?'Kay\u0131t Ol':'Giri\u015f Yap';document.getElementById('koAuthSwitch').textContent=signup?'Giri\u015fe Ge\u00e7':'Kay\u0131t Ol';message.textContent='';overlay.classList.add('ko-open');};
 document.getElementById('koAuthClose').onclick=()=>overlay.classList.remove('ko-open');
 document.getElementById('koAuthSwitch').onclick=()=>window.koOpenAuth(!signup);
@@ -1311,8 +1336,8 @@ async function loadTopics(){
     const date=document.createElement('div');date.className='ko-post-date';date.textContent=new Date(when).toLocaleString('tr-TR')+' Â· #'+number;
     const body=document.createElement('div');body.className='ko-post-text';body.textContent=text;
     const actions=document.createElement('div');actions.className='ko-post-actions';
-    const reply=document.createElement('button');reply.type='button';reply.textContent='YanÃ„Â±tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
-    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'YanÃ„Â±tÃ„Â± Sil';del.onclick=deleteAction;actions.appendChild(del);}
+    const reply=document.createElement('button');reply.type='button';reply.textContent='YanÄ±tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
+    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'YanÄ±tÃ„Â± Sil';del.onclick=deleteAction;actions.appendChild(del);}
     right.append(date,body,actions);post.append(left,right);detail.appendChild(post);
    };
    const rankOf=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'GÃ¼mÃ¼ÅŸ':exp>=500?'Bronz':exp>=100?'Ã‡aylak':'Yeni Ãœye';
@@ -1332,15 +1357,15 @@ async function loadTopics(){
    if(commentError){const err=document.createElement('p');err.textContent='YanÄ±tlar yÃ¼klenemedi: '+commentError.message;detail.appendChild(err);}
    else for(let i=0;i<(comments||[]).length;i++){
     const c=comments[i];const person=people.get(c.user_id)||{name:'Ãœye'};
-    const delComment=async()=>{if(!confirm('YanÃ„Â±tÃ„Â± silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
+    const delComment=async()=>{if(!confirm('YanÄ±tÃ„Â± silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
     addPost(c.content,person,c.created_at,!!(currentUser&&(isAdmin||currentUser.id===c.user_id)),delComment,i+2);
    }
    const replyBox=document.createElement('div');replyBox.className='ko-reply-box';
-   const label=document.createElement('h3');label.textContent='YanÃ„Â±t Yaz';
-   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='MesajÃ„Â±nÃ„Â± buraya yaz...';
+   const label=document.createElement('h3');label.textContent='YanÄ±t Yaz';
+   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='MesajÄ±nÄ± buraya yaz...';
    const send=document.createElement('button');send.type='button';send.className='btn';send.textContent='YanÄ±tÄ± GÃ¶nder';
    const info=document.createElement('p');info.style.marginTop='10px';
-   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='YanÃ„Â±t en az 2 karakter olmalÃ„Â±.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='YanÄ±t gÃ¶nderilemedi: '+error.message;return;}btn.click();};
+   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='YanÄ±t en az 2 karakter olmalÄ±.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='YanÄ±t gÃ¶nderilemedi: '+error.message;return;}btn.click();};
    replyBox.append(label,textarea,send,info);detail.appendChild(replyBox);
   };
   list.appendChild(btn);
