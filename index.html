@@ -1039,7 +1039,7 @@
 <div id="koProfileOverlay"><div id="koProfileDialog" role="dialog" aria-modal="true" aria-label="Profil ayarlar&#305;">
 <h2>Profilim</h2><p id="koProfileInfo" style="color:#d4c4a3;font-size:12px;line-height:1.7"></p>
 <form id="koProfileForm"><label for="koProfileName">Kullan&#305;c&#305; ad&#305;</label><input id="koProfileName" minlength="3" maxlength="30" required autocomplete="nickname">
-<label for="koProfileAvatar">Profil foto&#287;raf&#305; y&#252;kle (iste&#287;e ba&#287;l&#305;)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">BilgisayarÄ±ndan JPG, PNG veya WebP seÃ§. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil fotoÄŸrafÄ± Ã¶nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
+<label for="koProfileAvatar">Profil foto&#287;raf&#305; y&#252;kle (iste&#287;e ba&#287;l&#305;)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">Bilgisayar&#305;ndan JPG, PNG veya WebP se&#231;. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil fotoÄŸrafÄ± Ã¶nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
 <div class="ko-actions"><button type="submit" class="btn">Profili Kaydet</button><button type="button" class="btn" id="koProfileClose">Kapat</button></div></form>
 <form id="koPasswordForm" style="margin-top:20px;padding-top:15px;border-top:1px solid #66563c"><h3 style="color:#f4d995;font-size:14px">&#350;ifre De&#287;i&#351;tir</h3>
 <label for="koNewPassword">Yeni &#351;ifre (en az 6 karakter)</label><input id="koNewPassword" type="password" minlength="6" required autocomplete="new-password">
@@ -1161,12 +1161,12 @@ document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 .ko-real-topic{width:100%;text-align:left;display:block;border:0;border-bottom:1px solid #354044;background:transparent;color:#f2e5c9;padding:14px 16px;cursor:pointer}
 .ko-real-topic:hover{background:#29332e}.ko-real-topic small{display:block;color:#aeb2ae;margin-top:5px}
 </style>
-<div id="koTopicModal" role="presentation"><div class="ko-topic-form-box" role="dialog" aria-modal="true" aria-label="Yeni konu oluÅŸtur">
-<h2>Yeni Konu AÃ§</h2>
-<form id="koTopicForm"><label for="koTopicCategory">Forum kategorisi / Sunucu</label><select id="koTopicCategory" required><option value="">Kategoriler yÃ¼kleniyor...</option></select>
-<label for="koTopicNewTitle">Konu baÅŸlÄ±ÄŸÄ±</label><input id="koTopicNewTitle" required minlength="5" maxlength="150" placeholder="Konu baÅŸlÄ±ÄŸÄ±nÄ± yaz">
-<label for="koTopicNewContent">Konu iÃ§eriÄŸi</label><textarea id="koTopicNewContent" required minlength="10" maxlength="20000" placeholder="Konunu buraya yaz..."></textarea>
-<div class="ko-topic-buttons"><button class="btn" type="submit" id="koTopicSubmit">Konuyu YayÄ±nla</button><button class="btn" type="button" id="koTopicCancel">Kapat</button></div>
+<div id="koTopicModal" role="presentation"><div class="ko-topic-form-box" role="dialog" aria-modal="true" aria-label="Yeni konu olu&#351;tur">
+<h2>Yeni Konu A&#231;</h2>
+<form id="koTopicForm"><label for="koTopicCategory">Forum kategorisi / Sunucu</label><select id="koTopicCategory" required><option value="">Kategoriler y&#252;kleniyor...</option></select>
+<label for="koTopicNewTitle">Konu ba&#351;l&#305;&#287;&#305;</label><input id="koTopicNewTitle" required minlength="5" maxlength="150" placeholder="Konu ba&#351;l&#305;&#287;&#305;n&#305; yaz">
+<label for="koTopicNewContent">Konu i&#231;eri&#287;i</label><textarea id="koTopicNewContent" required minlength="10" maxlength="20000" placeholder="Konunu buraya yaz..."></textarea>
+<div class="ko-topic-buttons"><button class="btn" type="submit" id="koTopicSubmit">Konuyu Yay&#305;nla</button><button class="btn" type="button" id="koTopicCancel">Kapat</button></div>
 <p id="koTopicStatus" role="status"></p></form></div></div>
 <script>
 (function(){
@@ -1177,20 +1177,20 @@ let categories=[];
 function categoryName(c){return String(c.name??c.title??c.ad??c.category_name??('Kategori '+c.id));}
 function tabFor(name){const n=name.toLocaleLowerCase('tr-TR');if(n.includes('duyuru'))return 'duyurular';if(n.includes('genel')||n.includes('knight online'))return 'cz';if(n.includes('zero'))return 'zero';if(n.includes('agartha'))return 'agartha';return null;}
 async function loadCategories(){
- const db=client();if(!db)throw Error('VeritabanÄ± baÄŸlantÄ±sÄ± kurulamadÄ±.');
+ const db=client();if(!db)throw Error('Veritaban\u0131 ba\u011flant\u0131s\u0131 kurulamad\u0131.');
  const {data,error}=await db.from('categories').select('*').order('id',{ascending:true});if(error)throw error;
  categories=(data||[]).filter(c=>c.id!=null);
- category.replaceChildren();const empty=document.createElement('option');empty.value='';empty.textContent='Kategori seÃ§';category.appendChild(empty);
+ category.replaceChildren();const empty=document.createElement('option');empty.value='';empty.textContent='Kategori se\u00e7';category.appendChild(empty);
  for(const c of categories){const option=document.createElement('option');option.value=String(c.id);option.textContent=categoryName(c);category.appendChild(option);}
- if(!categories.length)status.textContent='HenÃ¼z veritabanÄ±nda kategori yok. Ã–nce categories tablosuna kategori eklenmeli.';
+ if(!categories.length)status.textContent='Hen\u00fcz veritaban\u0131nda kategori yok. \u00d6nce categories tablosuna kategori eklenmeli.';
 }
 window.koOpenNewTopic=async function(){
- const db=client();if(!db){alert('Supabase baÄŸlantÄ±sÄ± kurulamadÄ±.');return;}
+ const db=client();if(!db){alert('Supabase ba\u011flant\u0131s\u0131 kurulamad\u0131.');return;}
  const {data:{user}}=await db.auth.getUser();if(!user){window.koOpenAuth?.(false);return;}
  status.textContent='';modal.classList.add('ko-open');
  try{await loadCategories();const selected=document.querySelector('[data-forum-tab].active')?.dataset.forumTab;
  const match=categories.find(c=>tabFor(categoryName(c))===selected);if(match)category.value=String(match.id);
- }catch(e){status.textContent='Kategoriler alÄ±namadÄ±: '+e.message;}
+ }catch(e){status.textContent='Kategoriler al\u0131namad\u0131: '+e.message;}
 };
 function close(){modal.classList.remove('ko-open');}
 document.getElementById('koTopicCancel').onclick=close;
@@ -1198,12 +1198,12 @@ modal.addEventListener('click',e=>{if(e.target===modal)close();});
 form.addEventListener('submit',async e=>{
  e.preventDefault();const db=client();const button=document.getElementById('koTopicSubmit');button.disabled=true;status.textContent='Konu kaydediliyor...';
  try{
- const {data:{user},error:authError}=await db.auth.getUser();if(authError||!user)throw Error('Ã–nce giriÅŸ yapmalÄ±sÄ±n.');
+ const {data:{user},error:authError}=await db.auth.getUser();if(authError||!user)throw Error('\u00d6nce giri\u015f yapmal\u0131s\u0131n.');
  const title=document.getElementById('koTopicNewTitle').value.trim(),content=document.getElementById('koTopicNewContent').value.trim();
- if(title.length<5||content.length<10||!category.value)throw Error('Kategori, en az 5 karakter baÅŸlÄ±k ve 10 karakter iÃ§erik gerekli.');
+ if(title.length<5||content.length<10||!category.value)throw Error('Kategori, en az 5 karakter ba\u015fl\u0131k ve 10 karakter i\u00e7erik gerekli.');
  const selectedCategory=categories.find(c=>String(c.id)===category.value);
  const {error}=await db.from('topics').insert({category_id:Number(category.value),user_id:user.id,title,content});if(error)throw error;
- status.textContent='Konu baÅŸarÄ±yla yayÄ±nlandÄ±!';const target=selectedCategory&&tabFor(categoryName(selectedCategory));
+ status.textContent='Konu ba\u015far\u0131yla yay\u0131nland\u0131!';const target=selectedCategory&&tabFor(categoryName(selectedCategory));
  form.reset();setTimeout(()=>{close();if(target&&typeof showForumTab==='function')showForumTab(target);loadTopics();},650);
  }catch(err){status.textContent='Konu kaydedilemedi: '+(err.message||'Bilinmeyen hata');}finally{button.disabled=false;}
 });
@@ -1211,14 +1211,31 @@ async function loadTopics(){
  const db=client();if(!db)return;
  const {data:cats,error:catError}=await db.from('categories').select('*');if(catError)return;
  const {data:topics,error}=await db.from('topics').select('id,category_id,title,content,created_at,user_id').order('created_at',{ascending:false}).limit(100);if(error)return;
+ const ids=[...new Set((topics||[]).map(t=>t.user_id).filter(Boolean))];
+ const authors=new Map();
+ if(ids.length){
+  const {data:profiles,error:profileError}=await db.from('profiles').select('id,username,exp').in('id',ids);
+  if(!profileError)for(const p of profiles||[])authors.set(p.id,{name:p.username,exp:p.exp});
+  const missing=ids.filter(id=>!authors.get(id)?.name);
+  if(missing.length){const {data:forumProfiles,error:forumError}=await db.from('forum_profiles').select('user_id,display_name').in('user_id',missing);
+   if(!forumError)for(const p of forumProfiles||[]){const old=authors.get(p.user_id)||{};authors.set(p.user_id,{...old,name:old.name||p.display_name});}
+  }
+ }
  document.querySelectorAll('.ko-dynamic-topics').forEach(el=>el.remove());
- for(const t of topics||[]){const cat=(cats||[]).find(c=>String(c.id)===String(t.category_id));if(!cat)continue;
- const tab=tabFor(categoryName(cat));if(!tab)continue;
- const panel=document.querySelector('[data-forum-panel="'+tab+'"] .forum-category-list');if(!panel)continue;
- let list=panel.querySelector('.ko-dynamic-topics');if(!list){list=document.createElement('div');list.className='ko-dynamic-topics';panel.appendChild(list);}
- const btn=document.createElement('button');btn.type='button';btn.className='ko-real-topic';
- const heading=document.createElement('strong');heading.textContent=t.title;const small=document.createElement('small');small.textContent='Ãœye konusu Â· '+new Date(t.created_at).toLocaleDateString('tr-TR');
- btn.append(heading,small);btn.onclick=()=>openKoTopic(t.title,'Ãœye',t.content);list.appendChild(btn);
+ for(const t of topics||[]){
+  const cat=(cats||[]).find(c=>String(c.id)===String(t.category_id));if(!cat)continue;
+  const tab=tabFor(categoryName(cat));if(!tab)continue;
+  const panel=document.querySelector('[data-forum-panel="'+tab+'"] .forum-category-list');if(!panel)continue;
+  let list=panel.querySelector('.ko-dynamic-topics');if(!list){list=document.createElement('div');list.className='ko-dynamic-topics';panel.appendChild(list);}
+  const author=authors.get(t.user_id)||{};
+  const name=author.name||'\u00dcye';
+  const rank=typeof author.exp==='number'?(author.exp>=50000?'Emektar':author.exp>=35000?'Efsane':author.exp>=20000?'Usta':author.exp>=10000?'Elmas':author.exp>=5000?'Platin':author.exp>=2500?'Gold':author.exp>=1000?'G\u00fcm\u00fc\u015f':author.exp>=500?'Bronz':author.exp>=100?'\u00c7aylak':'Yeni \u00dcye'):null;
+  const btn=document.createElement('button');btn.type='button';btn.className='ko-real-topic';
+  const heading=document.createElement('strong');heading.textContent=t.title;
+  const small=document.createElement('small');small.textContent='A\u00e7an: '+name+' \u00b7 '+new Date(t.created_at).toLocaleDateString('tr-TR')+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'');
+  btn.append(heading,small);
+  btn.onclick=()=>{openKoTopic(t.title,name,t.content);document.getElementById('koTopicAuthor').textContent='Konuyu a\u00e7an: '+name+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'')+' \u00b7 '+new Date(t.created_at).toLocaleString('tr-TR');};
+  list.appendChild(btn);
  }
 }
 document.addEventListener('DOMContentLoaded',loadTopics);
