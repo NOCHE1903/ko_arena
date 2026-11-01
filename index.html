@@ -629,6 +629,22 @@
                     <h2 id="koMarketDetailTitle" style="color:#f2d391;margin-bottom:12px"></h2>
                     <p id="koMarketDetailMeta" style="color:#d9c9a8;margin-bottom:14px"></p>
                     <p id="koMarketDetailDescription" style="white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere"></p>
+<div id="koMarketSocial" style="margin-top:20px">
+<div id="koMarketSeller" class="forum-card-box" style="justify-content:flex-start"></div>
+<div class="panel-box"><div class="panel-header">&#304;lan Yorumlar&#305;</div><div class="panel-body">
+<div id="koMarketComments"></div>
+<form id="koMarketCommentForm" style="display:grid;gap:9px;margin-top:14px">
+<textarea id="koMarketCommentText" class="wheel-input" rows="3" maxlength="2000" required placeholder="&#304;lan hakk&#305;nda yorum yaz..."></textarea>
+<button class="btn" type="submit">Yorum G&#246;nder</button></form><p id="koMarketCommentStatus" role="status"></p>
+</div></div>
+<div class="panel-box"><div class="panel-header">&#214;zel Mesajlar</div><div class="panel-body">
+<p id="koMarketMessageInfo" style="margin-bottom:10px"></p>
+<div id="koMarketMessages" style="display:grid;gap:8px;margin-bottom:12px"></div>
+<form id="koMarketMessageForm" style="display:grid;gap:9px">
+<textarea id="koMarketMessageText" class="wheel-input" rows="3" maxlength="3000" required placeholder="Sat&#305;c&#305;ya &#246;zel mesaj yaz..."></textarea>
+<button class="btn" type="submit">&#214;zel Mesaj G&#246;nder</button></form>
+<p id="koMarketMessageStatus" role="status"></p>
+</div></div></div>
                   </div>
                 </section>
             </div>
@@ -1076,6 +1092,7 @@ const marketDetail=document.getElementById('koMarketDetail');
 const marketBack=document.getElementById('koMarketBack');
 const marketFilters=document.querySelector('#pazarSec .filter-grid');
 function koCloseMarketDetail(){
+ ++koMarketNav;koActiveAd=null;
  marketDetail.hidden=true;marketDetail.style.display='none';
  marketList.hidden=false;marketList.style.display='';
  marketLoadStatus.hidden=false;
@@ -1092,9 +1109,132 @@ function koOpenMarketDetail(ad){
  marketLoadStatus.hidden=true;
  if(marketFilters)marketFilters.hidden=true;
  marketDetail.hidden=false;marketDetail.style.display='block';
+ koMarketSocialOpen(ad);
  marketDetail.scrollIntoView({behavior:'smooth',block:'start'});
 }
 marketBack.addEventListener('click',koCloseMarketDetail);
+
+let koActiveAd=null,koMarketOtherUser=null,koMarketNav=0;
+const koMarketNode=(id)=>document.getElementById(id);
+const koMarketSay=(id,msg)=>{koMarketNode(id).textContent=msg;};
+const koMarketDate=(value)=>new Date(value).toLocaleString('tr-TR');
+const koMarketRanks=[[50000,'Emektar'],[35000,'Efsane'],[20000,'Usta'],[10000,'Elmas'],[5000,'Platin'],[2500,'Gold'],[1000,'G\u00fcm\u00fc\u015f'],[500,'Bronz'],[100,'\u00c7aylak'],[0,'Yeni \u00dcye']];
+async function koMarketProfile(id){
+ const [a,b]=await Promise.all([
+ client.from('profiles').select('username,exp,created_at').eq('id',id).maybeSingle(),
+ client.from('forum_profiles').select('display_name,avatar_url').eq('user_id',id).maybeSingle()
+ ]);
+ const x=a.data||{},y=b.data||{},exp=Number(x.exp)||0;
+ return {name:y.display_name||x.username||'\u00dcye',avatar:y.avatar_url,exp,rank:koMarketRanks.find(z=>exp>=z[0])[1],joined:x.created_at};
+}
+function koMarketPerson(profile){
+ const wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:center;gap:12px;min-width:0';
+ const avatar=document.createElement('div');avatar.style.cssText='width:54px;height:54px;flex-shrink:0;border-radius:50%;background:#243039;border:1px solid #a78b54;display:grid;place-items:center;overflow:hidden';
+ if(profile.avatar&&/^https:\/\//i.test(profile.avatar)){const img=document.createElement('img');img.src=profile.avatar;img.alt='Profil foto\u011fraf\u0131';img.style.cssText='width:100%;height:100%;object-fit:cover';avatar.append(img);}
+ else avatar.textContent='\u1f464';
+ const info=document.createElement('div');
+ const name=document.createElement('strong');name.textContent=profile.name;name.style.color='#f2d391';
+ const meta=document.createElement('div');meta.style.cssText='font-size:12px;color:#b8c1bf;margin-top:5px';meta.textContent=profile.rank+' \u00b7 '+profile.exp+' EXP'+(profile.joined?' \u00b7 Kay\u0131t: '+new Date(profile.joined).toLocaleDateString('tr-TR'):'');
+ info.append(name,meta);wrap.append(avatar,info);return wrap;
+}
+async function koMarketLoadComments(ad,token){
+ const area=koMarketNode('koMarketComments');area.replaceChildren();area.textContent='Yorumlar y\u00fckleniyor...';
+ const {data,error}=await client.from('ko_market_comments').select('id,user_id,content,created_at').eq('ad_id',ad.id).order('created_at',{ascending:true});
+ if(token!==koMarketNav)return;
+ area.replaceChildren();
+ if(error){area.textContent='Yorumlar y\u00fcklenemedi: '+error.message;return;}
+ if(!data?.length){area.textContent='Hen\u00fcz yorum yok.';return;}
+ const ids=[...new Set(data.map(x=>x.user_id))];
+ const profiles=await Promise.all(ids.map(id=>koMarketProfile(id)));
+ if(token!==koMarketNav)return;
+ const lookup=new Map(ids.map((id,i)=>[id,profiles[i]]));
+ const {data:{user}}=await client.auth.getUser();
+ for(const comment of data){
+ const box=document.createElement('div');box.className='forum-card-box';box.style.cssText='display:block;margin:10px 0';
+ const top=koMarketPerson(lookup.get(comment.user_id));
+ const date=document.createElement('small');date.textContent=koMarketDate(comment.created_at);date.style.color='#9ba6a7';
+ const body=document.createElement('p');body.textContent=comment.content;body.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px;line-height:1.6';
+ box.append(top,date,body);
+ if(user?.id===comment.user_id){
+ const del=document.createElement('button');del.type='button';del.className='btn btn-red';del.style.marginTop='10px';del.textContent='Yorumu Sil';
+ del.onclick=async()=>{if(!confirm('Yorum silinsin mi?'))return;const {error}=await client.from('ko_market_comments').delete().eq('id',comment.id);if(error)alert(error.message);else koMarketLoadComments(ad,token);};
+ box.append(del);
+ }
+ area.append(box);
+ }
+}
+async function koMarketLoadMessages(ad,token){
+ const area=koMarketNode('koMarketMessages');area.replaceChildren();
+ const {data:{user}}=await client.auth.getUser();
+ const form=koMarketNode('koMarketMessageForm');
+ if(token!==koMarketNav)return;
+ if(!user){koMarketSay('koMarketMessageInfo','\u00d6zel mesajla\u015fmak i\u00e7in giri\u015f yap.');form.hidden=true;return;}
+ if(user.id===ad.user_id){
+ koMarketSay('koMarketMessageInfo','Bu ilan sana ait. Al\u0131c\u0131lardan gelen mesajlar:');
+ form.hidden=!koMarketOtherUser;
+ }else{
+ koMarketOtherUser=ad.user_id;form.hidden=false;
+ koMarketSay('koMarketMessageInfo','Bu yaz\u0131\u015fmay\u0131 yaln\u0131zca sen ve ilan sahibi g\u00f6rebilirsiniz.');
+ }
+ const {data,error}=await client.from('ko_market_messages').select('id,sender_id,receiver_id,content,created_at').eq('ad_id',ad.id).or('sender_id.eq.'+user.id+',receiver_id.eq.'+user.id).order('created_at',{ascending:true});
+ if(token!==koMarketNav)return;
+ if(error){area.textContent='Mesajlar y\u00fcklenemedi: '+error.message;return;}
+ if(user.id===ad.user_id){
+ const contacts=[...new Set((data||[]).map(m=>m.sender_id===user.id?m.receiver_id:m.sender_id))];
+ const select=document.createElement('select');select.className='filter-select';
+ select.append(new Option('Mesajla\u015faca\u011f\u0131n al\u0131c\u0131y\u0131 se\u00e7',''));
+ const profs=await Promise.all(contacts.map(id=>koMarketProfile(id)));
+ if(token!==koMarketNav)return;
+ contacts.forEach((id,i)=>select.append(new Option(profs[i].name,id)));
+ select.value=koMarketOtherUser||'';
+ select.onchange=()=>{koMarketOtherUser=select.value||null;koMarketLoadMessages(ad,token);};
+ area.append(select);
+ if(!koMarketOtherUser){form.hidden=true;return;}
+ form.hidden=false;
+ }
+ const visible=(data||[]).filter(m=>m.sender_id===koMarketOtherUser||m.receiver_id===koMarketOtherUser);
+ if(!visible.length){const p=document.createElement('p');p.textContent='Hen\u00fcz \u00f6zel mesaj yok.';area.append(p);}
+ for(const m of visible){
+ const div=document.createElement('div');div.style.cssText='padding:10px;border:1px solid #67593f;border-radius:5px;background:'+(m.sender_id===user.id?'#2d342c':'#18252e');
+ const who=document.createElement('strong');who.textContent=m.sender_id===user.id?'Sen':'Kar\u015f\u0131 taraf';
+ const msg=document.createElement('p');msg.textContent=m.content;msg.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;margin:7px 0';
+ const time=document.createElement('small');time.textContent=koMarketDate(m.created_at);
+ div.append(who,msg,time);area.append(div);
+ }
+}
+async function koMarketSocialOpen(ad){
+ const token=++koMarketNav;koActiveAd=ad;koMarketOtherUser=null;
+ const seller=koMarketNode('koMarketSeller');seller.replaceChildren();seller.textContent='Sat\u0131c\u0131 y\u00fckleniyor...';
+ koMarketNode('koMarketComments').textContent='';
+ koMarketNode('koMarketMessages').textContent='';
+ koMarketSay('koMarketCommentStatus','');koMarketSay('koMarketMessageStatus','');
+ const profile=await koMarketProfile(ad.user_id);
+ if(token!==koMarketNav)return;
+ seller.replaceChildren();seller.append(koMarketPerson(profile));
+ const badge=document.createElement('span');badge.textContent='\u0130lan Sahibi';badge.style.cssText='margin-left:auto;color:#e7bd67';seller.append(badge);
+ await Promise.all([koMarketLoadComments(ad,token),koMarketLoadMessages(ad,token)]);
+}
+koMarketNode('koMarketCommentForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!koActiveAd)return;
+ const {data:{user}}=await client.auth.getUser();
+ if(!user){koMarketSay('koMarketCommentStatus','Yorum yapmak i\u00e7in giri\u015f yap.');window.koOpenAuth?.(false);return;}
+ const text=koMarketNode('koMarketCommentText').value.trim();if(!text)return;
+ const {error}=await client.from('ko_market_comments').insert({ad_id:koActiveAd.id,user_id:user.id,content:text});
+ if(error){koMarketSay('koMarketCommentStatus','Hata: '+error.message);return;}
+ koMarketNode('koMarketCommentText').value='';koMarketSay('koMarketCommentStatus','Yorum g\u00f6nderildi.');
+ koMarketLoadComments(koActiveAd,koMarketNav);
+});
+koMarketNode('koMarketMessageForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!koActiveAd||!koMarketOtherUser)return;
+ const {data:{user}}=await client.auth.getUser();
+ if(!user){koMarketSay('koMarketMessageStatus','\u00d6nce giri\u015f yap.');window.koOpenAuth?.(false);return;}
+ const text=koMarketNode('koMarketMessageText').value.trim();if(!text)return;
+ const {error}=await client.from('ko_market_messages').insert({ad_id:koActiveAd.id,sender_id:user.id,receiver_id:koMarketOtherUser,content:text});
+ if(error){koMarketSay('koMarketMessageStatus','Hata: '+error.message);return;}
+ koMarketNode('koMarketMessageText').value='';koMarketSay('koMarketMessageStatus','\u00d6zel mesaj g\u00f6nderildi.');
+ koMarketLoadMessages(koActiveAd,koMarketNav);
+});
+
 
 async function koLoadMarket(){
  if(!client)return;
