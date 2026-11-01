@@ -1543,7 +1543,21 @@ async function loadTopics(){
    const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='Mesaj\u0131n\u0131 buraya yaz...';
    const send=document.createElement('button');send.type='button';send.className='btn';send.textContent='Yan\u0131t\u0131 G\u00f6nder';
    const info=document.createElement('p');info.style.marginTop='10px';
-   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='Yan\u0131t en az 2 karakter olmal\u0131.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='Yan\u0131t g\u00f6nderilemedi: '+error.message;return;}btn.click();};
+   send.onclick=async()=>{
+    const content=textarea.value.trim();
+    if(content.length<2){info.textContent='Yan\u0131t en az 2 karakter olmal\u0131.';return;}
+    send.disabled=true;
+    try{
+      const {data:{session},error:sessionError}=await db.auth.getSession();
+      if(sessionError||!session?.access_token){info.textContent='Oturum bulunamad\u0131. L\u00fctfen yeniden giri\u015f yap.';window.koOpenAuth?.(false);return;}
+      const {data:{user},error:userError}=await db.auth.getUser();
+      if(userError||!user||user.id!==session.user?.id){info.textContent='Oturum do\u011frulanamad\u0131. L\u00fctfen yeniden giri\u015f yap.';return;}
+      const {error}=await db.from('comments').insert({topic_id:t.id,user_id:user.id,content});
+      if(error){info.textContent='Yan\u0131t g\u00f6nderilemedi: '+error.message+(error.code?' ('+error.code+')':'');return;}
+      btn.click();
+    }catch(err){info.textContent='Yan\u0131t g\u00f6nderilemedi: '+(err?.message||String(err));}
+    finally{send.disabled=false;}
+   };
    replyBox.append(label,textarea,send,info);detail.appendChild(replyBox);
   };
   list.appendChild(btn);
