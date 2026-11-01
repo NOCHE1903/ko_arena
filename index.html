@@ -472,9 +472,9 @@
             <li><a onclick="switchSection('adminSec')" id="btnAdmin" style="color:var(--primary-red);"><i class="fa-solid fa-lock"></i> Y&#246;netim Paneli</a></li>
         </ul>
 
-        <div class="auth-box">
-            <button class="btn" onclick="alert('Giri&#351; sistemi hen&#252;z ba&#287;l&#305; de&#287;il; bu bir &#246;nizlemedir.')"><i class="fa-solid fa-right-to-bracket"></i> Giri&#351; Yap</button>
-            <button class="btn btn-red" onclick="alert('Kay&#305;t sistemi hen&#252;z ba&#287;l&#305; de&#287;il; bu bir &#246;nizlemedir.')"><i class="fa-solid fa-user-plus"></i> Kay&#305;t Ol</button>
+        <div class="auth-box" id="koAuthBox">
+            <button class="btn" type="button" onclick="koOpenAuth(false)"><i class="fa-solid fa-right-to-bracket"></i> GiriÅŸ Yap</button>
+            <button class="btn btn-red" type="button" onclick="koOpenAuth(true)"><i class="fa-solid fa-user-plus"></i> KayÄ±t Ol</button>
         </div>
     </header>
 
@@ -1003,5 +1003,40 @@
             document.querySelectorAll('[data-forum-panel]').forEach(el=>el.hidden=el.dataset.forumPanel!==name);
         }
     </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+#koAuthOverlay{position:fixed;inset:0;background:#000c;z-index:99999;display:none;align-items:center;justify-content:center;padding:15px}
+#koAuthOverlay.ko-open{display:flex}#koAuthDialog{width:min(420px,100%);background:#111a20;border:1px solid #b99b5a;border-radius:7px;padding:24px;box-shadow:0 15px 65px #000}
+#koAuthDialog h2{font-family:Cinzel,serif;color:#f4d995;margin-bottom:16px}#koAuthDialog label{display:block;font-size:12px;color:#e5d6b5;margin:12px 0 5px}
+#koAuthDialog input{display:block;width:100%;padding:11px;background:#080d11;color:white;border:1px solid #766441;border-radius:3px}#koAuthDialog .ko-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
+#koAuthMessage{font-size:12px;line-height:1.5;margin-top:12px;color:#f1c97b;overflow-wrap:anywhere}
+</style>
+<div id="koAuthOverlay" role="presentation"><div id="koAuthDialog" role="dialog" aria-modal="true" aria-label="Ãœyelik iÅŸlemleri"><h2 id="koAuthHeading">GiriÅŸ Yap</h2>
+<form id="koAuthForm"><div id="koUsernameWrap" hidden><label for="koUsername">KullanÄ±cÄ± adÄ±</label><input id="koUsername" name="username" minlength="3" maxlength="30" autocomplete="username"></div>
+<label for="koEmail">E-posta</label><input id="koEmail" name="email" type="email" required autocomplete="email">
+<label for="koPassword">Åifre</label><input id="koPassword" name="password" type="password" minlength="6" required autocomplete="current-password">
+<div class="ko-actions"><button class="btn" id="koAuthSubmit" type="submit">GiriÅŸ Yap</button><button class="btn btn-red" id="koAuthSwitch" type="button">KayÄ±t Ol</button><button class="btn" id="koAuthClose" type="button">Kapat</button></div></form><p id="koAuthMessage" role="status"></p></div></div>
+<script>
+(function(){
+'use strict';
+const url='https://lwwkaigzcvdjkhacspap.supabase.co';
+const key='sb_publishable_7CgqHp9juimHLgkQNz5H0g_5dsNqKiD';
+const authBox=document.getElementById('koAuthBox');
+const overlay=document.getElementById('koAuthOverlay');
+const form=document.getElementById('koAuthForm');
+const message=document.getElementById('koAuthMessage');
+let signup=false;
+const client=window.supabase?.createClient(url,key);
+window.koSupabase=client;
+window.koOpenAuth=function(mode){signup=!!mode;document.getElementById('koAuthHeading').textContent=signup?'KayÄ±t Ol':'GiriÅŸ Yap';document.getElementById('koUsernameWrap').hidden=!signup;document.getElementById('koUsername').required=signup;document.getElementById('koAuthSubmit').textContent=signup?'KayÄ±t Ol':'GiriÅŸ Yap';document.getElementById('koAuthSwitch').textContent=signup?'GiriÅŸe GeÃ§':'KayÄ±t Ol';message.textContent='';overlay.classList.add('ko-open');};
+document.getElementById('koAuthClose').onclick=()=>overlay.classList.remove('ko-open');
+document.getElementById('koAuthSwitch').onclick=()=>window.koOpenAuth(!signup);
+overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('ko-open');});
+async function renderUser(){if(!client)return;const {data:{user}}=await client.auth.getUser();authBox.replaceChildren();if(user){const name=document.createElement('span');name.style.cssText='align-self:center;color:#f4d995;font-size:12px';name.textContent=user.user_metadata?.username||user.email||'Ãœye';const logout=document.createElement('button');logout.className='btn btn-red';logout.textContent='Ã‡Ä±kÄ±ÅŸ Yap';logout.onclick=async()=>{const {error}=await client.auth.signOut();if(error)alert(error.message);else renderUser();};authBox.append(name,logout);}else{for(const [label,mode] of [['GiriÅŸ Yap',false],['KayÄ±t Ol',true]]){const btn=document.createElement('button');btn.className=mode?'btn btn-red':'btn';btn.textContent=label;btn.onclick=()=>window.koOpenAuth(mode);authBox.append(btn);}}}
+form.onsubmit=async e=>{e.preventDefault();if(!client){message.textContent='BaÄŸlantÄ± kÃ¼tÃ¼phanesi yÃ¼klenemedi. Ä°nternet baÄŸlantÄ±nÄ±zÄ± kontrol edin.';return;}const btn=document.getElementById('koAuthSubmit');btn.disabled=true;message.textContent='Ä°ÅŸlem yapÄ±lÄ±yor...';try{const email=form.email.value.trim();const password=form.password.value;let result;if(signup){const username=document.getElementById('koUsername').value.trim();if(username.length<3)throw Error('KullanÄ±cÄ± adÄ± en az 3 karakter olmalÄ±.');result=await client.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://noche1903.github.io/ko_arena/'}});}else result=await client.auth.signInWithPassword({email,password});if(result.error)throw result.error;if(signup&&!result.data.session){message.textContent='KayÄ±t alÄ±ndÄ±. E-posta doÄŸrulama baÄŸlantÄ±sÄ±nÄ± kontrol et.';}else{overlay.classList.remove('ko-open');form.reset();await renderUser();}}catch(err){message.textContent=err.message||'Ä°ÅŸlem baÅŸarÄ±sÄ±z.';}finally{btn.disabled=false;}};
+if(client){client.auth.onAuthStateChange(()=>setTimeout(renderUser,0));renderUser();}else message.textContent='Supabase yÃ¼klenemedi.';
+})();
+</script>
 </body>
 </html>
