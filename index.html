@@ -452,6 +452,19 @@
 .ko-forum-actions .ko-new-topic-btn{white-space:nowrap;background:linear-gradient(#b99a58,#80622f);color:#111;border-color:#e1c17b}
 .ko-forum-actions .filter-select{min-width:155px;max-width:230px;min-height:38px}
 @media(max-width:650px){.ko-forum-actions{margin-left:0;width:100%}.ko-forum-actions .filter-select{flex:1;min-width:130px}}
+
+/* KO ARENA geliÅŸmiÅŸ Ã§ekiliÅŸ Ã§arkÄ± */
+.ko-wheel-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(250px,.8fr);gap:24px;align-items:center;text-align:left}
+.ko-wheel-stage{position:relative;width:min(100%,520px);margin:auto;aspect-ratio:1}
+#koWheelCanvas{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 20px #0009)}
+.ko-wheel-pointer{position:absolute;z-index:2;top:-3px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:17px solid transparent;border-right:17px solid transparent;border-top:37px solid #f4d995;filter:drop-shadow(0 2px 3px #000)}
+.ko-wheel-controls label{display:block;font-size:13px;color:#f2d391;margin:10px 0}
+.ko-wheel-controls textarea{resize:vertical;line-height:1.5}
+#koWheelCount{color:#b8b0a0;font-size:12px;margin:5px 0 12px}
+.ko-wheel-check{display:flex!important;align-items:center;gap:8px;color:#e4d5bb!important}
+#koWheelResult{margin-top:14px;padding:13px;border:1px solid #80683f;background:#121d20;color:#f4d995;text-align:center;font-weight:800;overflow-wrap:anywhere}
+#koWheelHistory{margin-top:12px;color:#b8b0a0;font-size:12px;line-height:1.8}
+@media(max-width:800px){.ko-wheel-layout{grid-template-columns:1fr}.ko-wheel-stage{max-width:390px}}
 </style>
 </head>
 <body>
@@ -659,10 +672,10 @@
                 <div class="panel-box">
                     <div class="panel-header"><i class="fa-solid fa-dharmachakra"></i> Canl&#305; &#199;ark &#199;ekili&#351; Arac&#305;</div>
                     <div class="panel-body" style="text-align: center;">
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Kat&#305;l&#305;mc&#305; isimlerini virg&#252;lle ay&#305;rarak yaz&#305;n:</p>
-                        <input type="text" id="wheelInput" class="wheel-input" placeholder="Ahmet, Mehmet, Caner, Zeynep...">
-                        <div class="wheel-display-box" id="wheelDisplay">KO ARENA</div>
-                        <button class="btn" onclick="spinWheel()" style="width:100%;"><i class="fa-solid fa-play"></i> &#199;ark&#305; &#199;evir & Kazanan&#305; Se&#231;</button>
+                        <div class="ko-wheel-layout">
+                          <div class="ko-wheel-stage"><div class="ko-wheel-pointer"></div><canvas id="koWheelCanvas" width="600" height="600" aria-label="KatÄ±lÄ±mcÄ± Ã§arkÄ±"></canvas></div>
+                          <div class="ko-wheel-controls"><label for="wheelInput">KatÄ±lÄ±mcÄ±lar (her satÄ±ra veya virgÃ¼lle bir isim)</label><textarea id="wheelInput" class="wheel-input" rows="8" placeholder="Ahmet\nMehmet\nCaner\nZeynep"></textarea><div id="koWheelCount">0 katÄ±lÄ±mcÄ±</div><label class="ko-wheel-check"><input id="koWheelRemove" type="checkbox"> KazananÄ± sonraki turdan Ã§Ä±kar</label><button class="btn" type="button" id="koWheelSpin" onclick="spinWheel()" style="width:100%">Ã‡arkÄ± Ã‡evir</button><button class="btn btn-red" type="button" onclick="koWheelReset()" style="width:100%;margin-top:8px">Ã‡arkÄ± SÄ±fÄ±rla</button><div id="koWheelResult" role="status" aria-live="polite">Ã‡ekiliÅŸ iÃ§in isimleri gir.</div><div id="koWheelHistory"></div></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -788,28 +801,7 @@
             });
         }
 
-        function spinWheel() {
-            const inputVal = document.getElementById('wheelInput').value;
-            const display = document.getElementById('wheelDisplay');
-
-            if(!inputVal.trim()) {
-                alert("L\u00FCtfen \u00E7ekili\u015F i\u00E7in ge\u00E7erli kat\u0131l\u0131mc\u0131 isimleri girin!");
-                return;
-            }
-
-            const names = inputVal.split(',').map(n => n.trim()).filter(n => n);
-            const randomArray = new Uint32Array(1);
-            window.crypto.getRandomValues(randomArray);
-            const secureIndex = randomArray[0] % names.length;
-
-            display.style.transform = `rotate(${360 * 6 + Math.floor(Math.random() * 360)}deg)`;
-
-            setTimeout(() => {
-                const winner = names[secureIndex];
-                display.style.transform = 'rotate(0deg)';
-                display.innerHTML = "\uD83C\uDFC6 " + winner;
-            }, 3000);
-        }
+        // Ã‡ark modÃ¼lÃ¼ sayfanÄ±n sonunda tanÄ±mlanÄ±r.
 
         let currentExp = 420;
         function simulatePostAction() {
@@ -1564,6 +1556,22 @@ async function loadTopics(){
  }
 }
 document.addEventListener('DOMContentLoaded',loadTopics);
+})();
+</script>
+
+<script>
+(function(){
+ const canvas=document.getElementById('koWheelCanvas'),input=document.getElementById('wheelInput');
+ if(!canvas||!input)return;
+ const ctx=canvas.getContext('2d'), result=document.getElementById('koWheelResult'),count=document.getElementById('koWheelCount'),button=document.getElementById('koWheelSpin');
+ let rotation=0,spinning=false,history=[];
+ const colors=['#a83832','#c68a3d','#375c68','#6a4381','#4b783f','#a65b40','#39528a','#79642e'];
+ function names(){return input.value.split(/[,;\n]+/).map(v=>v.trim()).filter(Boolean).slice(0,200)}
+ function draw(){const list=names(),n=list.length,w=canvas.width,c=w/2,r=c-15;ctx.clearRect(0,0,w,w);ctx.save();ctx.translate(c,c);ctx.rotate(rotation);if(!n){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle='#1d292d';ctx.fill();ctx.fillStyle='#f4d995';ctx.font='bold 34px Cinzel,serif';ctx.textAlign='center';ctx.fillText('KO ARENA',0,12)}else{const slice=Math.PI*2/n;list.forEach((name,i)=>{const start=-Math.PI/2+i*slice;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,start,start+slice);ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();ctx.strokeStyle='#e9c77a';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.rotate(start+slice/2);ctx.translate(r*.62,0);ctx.rotate(Math.PI/2);ctx.fillStyle='#fff9eb';ctx.textAlign='center';ctx.font=`bold ${Math.max(11,Math.min(22,270/n+10))}px Inter,sans-serif`;const label=name.length>22?name.slice(0,20)+'â€¦':name;ctx.fillText(label,0,0,Math.max(45,r*.65));ctx.restore()})}ctx.restore();ctx.beginPath();ctx.arc(c,c,32,0,Math.PI*2);ctx.fillStyle='#f4d995';ctx.fill();ctx.strokeStyle='#503a20';ctx.lineWidth=7;ctx.stroke();count.textContent=n+' katÄ±lÄ±mcÄ±'+(input.value.split(/[,;\n]+/).filter(x=>x.trim()).length>200?' (ilk 200 kullanÄ±lÄ±yor)':'')}
+ input.addEventListener('input',()=>{if(!spinning)draw()});
+ window.koWheelReset=function(){if(spinning)return;rotation=0;history=[];result.textContent='Ã‡ekiliÅŸ iÃ§in isimleri gir.';document.getElementById('koWheelHistory').textContent='';draw()};
+ window.spinWheel=function(){if(spinning)return;const list=names();if(list.length<2){result.textContent='Ã‡ark iÃ§in en az 2 katÄ±lÄ±mcÄ± gir.';return}if(!window.crypto?.getRandomValues){result.textContent='GÃ¼venli rastgele seÃ§im bu tarayÄ±cÄ±da kullanÄ±lamÄ±yor.';return}spinning=true;button.disabled=true;input.disabled=true;const random=new Uint32Array(1);const limit=Math.floor(4294967296/list.length)*list.length;do{crypto.getRandomValues(random)}while(random[0]>=limit);const winnerIndex=random[0]%list.length;const slice=2*Math.PI/list.length;const normalized=((rotation%(2*Math.PI))+2*Math.PI)%(2*Math.PI);const target=((2*Math.PI-winnerIndex*slice-slice/2)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);const extra=((target-normalized+2*Math.PI)%(2*Math.PI));const from=rotation,to=rotation+2*Math.PI*7+extra,duration=5200,start=performance.now();result.textContent='Ã‡ark dÃ¶nÃ¼yor...';function frame(now){const t=Math.min(1,(now-start)/duration),ease=1-Math.pow(1-t,4);rotation=from+(to-from)*ease;draw();if(t<1){requestAnimationFrame(frame)}else{rotation=target;draw();result.textContent='Kazanan: '+list[winnerIndex];history.unshift(list[winnerIndex]);document.getElementById('koWheelHistory').textContent='Son kazananlar: '+history.slice(0,10).join(' â€¢ ');spinning=false;button.disabled=false;input.disabled=false;if(document.getElementById('koWheelRemove').checked){const all=input.value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);const idx=all.indexOf(list[winnerIndex]);if(idx>=0)all.splice(idx,1);input.value=all.join('\n');rotation=0;draw()}}}requestAnimationFrame(frame)};
+ draw();
 })();
 </script>
 </body>
