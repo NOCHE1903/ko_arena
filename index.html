@@ -995,17 +995,19 @@
         function showForumTab(tab){
             document.querySelectorAll('[data-forum-tab]').forEach(el=>{const active=el.dataset.forumTab===tab;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));});
             document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=el.dataset.forumPanel!==tab;el.style.display=el.hidden?'none':'block';});
-            closeKoTopic();
+            const detail=document.getElementById('koTopicDetail');
+            if(detail){detail.hidden=true;detail.style.display='none';}
         }
         function openKoTopic(title,author,body){
             const detail=document.getElementById('koTopicDetail');
             document.getElementById('koTopicTitle').textContent=title;
             document.getElementById('koTopicAuthor').textContent='Ba\u015Flatan: '+author;
             document.getElementById('koTopicBody').textContent=body;
-            document.querySelectorAll('[data-forum-panel]').forEach(el=>el.hidden=true);
+            document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=true;el.style.display='none';});
             detail.hidden=false;detail.style.display='block';
         }
         function closeKoTopic(){
+            window.koTopicNavigationToken=(window.koTopicNavigationToken||0)+1;
             const detail=document.getElementById('koTopicDetail');
             if(detail){detail.hidden=true;detail.style.display='none';}
             const tab=document.querySelector('[data-forum-tab].active');
@@ -1210,6 +1212,7 @@ document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 <script>
 (function(){
 'use strict';
+window.koTopicNavigationToken=0;
 const modal=document.getElementById('koTopicModal'),form=document.getElementById('koTopicForm'),category=document.getElementById('koTopicCategory'),status=document.getElementById('koTopicStatus');
 const client=()=>window.koSupabase;
 let categories=[];
@@ -1282,6 +1285,7 @@ async function loadTopics(){
   const contentWrap=document.createElement('span');contentWrap.className='ko-list-content';contentWrap.append(heading,small);
   btn.append(avatar,contentWrap);
   btn.onclick=async()=>{
+   const navigationToken=++window.koTopicNavigationToken;
    openKoTopic(t.title,name,t.content);
    const detail=document.getElementById('koTopicDetail');
    detail.replaceChildren();
@@ -1314,6 +1318,7 @@ async function loadTopics(){
    for(const p of ps||[])people.set(p.id,{name:p.username,exp:p.exp,created_at:p.created_at});
    const {data:fps}=await db.from('forum_profiles').select('user_id,display_name,avatar_url').in('user_id',[...new Set(allIds.filter(Boolean))]);
    for(const p of fps||[]){const prev=people.get(p.user_id)||{};people.set(p.user_id,{...prev,name:prev.name||p.display_name,avatar_url:p.avatar_url});}
+   if(navigationToken!==window.koTopicNavigationToken)return;
    const authorPerson={...people.get(t.user_id),name:people.get(t.user_id)?.name||name,exp:people.get(t.user_id)?.exp??author.exp};
    const deleteTopic=async()=>{if(!confirm('Konuyu kalÄ±cÄ± olarak silmek istiyor musun?'))return;const {error}=await db.from('topics').delete().eq('id',t.id);if(error){alert('Silinemedi: '+error.message);return;}closeKoTopic();loadTopics();};
    addPost(t.content,authorPerson,t.created_at,!!(currentUser&&(isAdmin||currentUser.id===t.user_id)),deleteTopic,1);
