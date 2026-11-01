@@ -763,18 +763,13 @@ function koAuthor(id){const p=koProfileCache.get(id)||{};const aside=document.cr
 function koPost(id,content){const post=document.createElement('div');post.className='ko-post';post.append(koAuthor(id));const body=document.createElement('div');body.className='ko-post-message';body.textContent=content||'';post.append(body);return post;}
 async function koCategories(){const {data,error}=await client.from('categories').select('*').limit(100);if(error){console.warn('Kategoriler:',error.message);koCategoryMap=[];return [];}koCategoryMap=data||[];return koCategoryMap;}
 function koCategoryMatch(label){const normalize=x=>String(x||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]/g,'');const a=normalize(label);return koCategoryMap.find(c=>normalize(c.name||c.title)===a)||koCategoryMap.find(c=>normalize(c.name||c.title).includes(a)||a.includes(normalize(c.name||c.title)));}
-async function koOpenCategory(label){
-  if(!client)return;
-  await koCategories();
-  const cat=koCategoryMatch(label);
-  if(!cat){alert('Kategori veritabanında bulunamadı: '+label);return;}
-  koSelectedCategory={id:cat.id,name:cat.name||cat.title};
-  location.hash='forum/kategori/'+encodeURIComponent(cat.id);
-  await koRenderRoute();
-}
-function koGoHome(){location.hash='forum';koRenderRoute();}
-function koOpenTopicPage(topic){location.hash='forum/konu/'+encodeURIComponent(topic.id);koRenderRoute();}
-function koBackToCategory(){if(koSelectedCategory){location.hash='forum/kategori/'+encodeURIComponent(koSelectedCategory.id);}else{location.hash='forum';}koRenderRoute();}
+function koSlug(label){return String(label||'').toLocaleLowerCase('tr-TR').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function koCategoryLabel(slug){return [...document.querySelectorAll('#koCategoryHome .forum-category-row strong')].map(x=>x.textContent.trim()).find(x=>koSlug(x)===slug)||null;}
+function koNavigate(path){const next='#/'+path;if(location.hash===next){koRenderRoute();}else{location.hash=next;}}
+function koOpenCategory(label){koNavigate('forum/kategori/'+encodeURIComponent(koSlug(label)));}
+function koGoHome(){koNavigate('forum');}
+function koOpenTopicPage(topic){koNavigate('forum/konu/'+encodeURIComponent(topic.id));}
+function koBackToCategory(){if(koSelectedCategory){koNavigate('forum/kategori/'+encodeURIComponent(koSlug(koSelectedCategory.name)));}else{koGoHome();}}
 function koForumScreen(mode){
   const home=document.getElementById('koCategoryHome');
   const tabs=document.getElementById('koForumTabs');
@@ -803,10 +798,12 @@ async function koRenderRoute(){
   if(route[0]!=='forum'){return;}
   switchSection('forumSec');
   if(route[1]==='kategori'&&route[2]){
+    const slug=route[2];
+    const label=koCategoryLabel(slug);
     const cats=await koCategories();if(version!==koRouteVersion)return;
-    const cat=cats.find(x=>String(x.id)===route[2]);
-    if(!cat){koGoHome();return;}
-    koSelectedCategory={id:cat.id,name:cat.name||cat.title};
+    const cat=cats.find(x=>String(x.id)===slug||koSlug(x.name||x.title)===slug)||(label?koCategoryMatch(label):null);
+    if(!label&&!cat){koGoHome();return;}
+    koSelectedCategory={id:cat?.id??null,name:cat?.name||cat?.title||label};
     koForumScreen('category');koBreadcrumb('Forum / '+koSelectedCategory.name,false);
     await loadTopics();
   }else if(route[1]==='konu'&&route[2]){
@@ -816,7 +813,7 @@ async function koRenderRoute(){
     koSelectedCategory=null;koForumScreen('home');
     await loadTopics();
   }
-  window.scrollTo({top:0,behavior:'instant'});
+  window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',()=>koRenderRoute());
 
@@ -825,6 +822,7 @@ async function loadTopics(){
   if(!client)return;
   const target=el('forumResults');if(!target)return;
   target.textContent='Konular yükleniyor...';
+  if(koSelectedCategory && !koSelectedCategory.id){target.textContent='Bu kategori henüz veritabanına bağlanmamış. Yönetici kategori kaydını oluşturduğunda konular burada görünecek.';return;}
   let q=client.from('topics').select('id,title,content,user_id,created_at,category_id').order('created_at',{ascending:false}).limit(100);
   if(koSelectedCategory)q=q.eq('category_id',koSelectedCategory.id);
   const {data,error}=await q;target.replaceChildren();
@@ -847,7 +845,7 @@ async function loadTopics(){
   if(koSelectedCategory){const add=document.createElement('button');add.className='btn';add.textContent='+ Yeni Konu Aç';add.onclick=()=>openTopicForm();target.prepend(add);}
 }
 
-async function openTopicForm(){if(!requireClient())return;if(!currentUser){openAuth(false);return;}const cats=await koCategories();if(!cats.length){alert('Veritabanında kategori bulunamadı. Önce SQL kurulumunu tamamlamalıyız.');return;}openModal('<h2>Yeni Konu Aç</h2><form id="topicForm"><label>Başlık</label><input name="title" maxlength="150" required><label>Kategori</label><select id="koTopicCategory" name="category_id" required></select><label>Mesaj</label><textarea id="koTopicMessage" name="content" rows="7" required></textarea><button class="btn" type="submit">Konuyu Yayınla</button></form>');const sel=el('koTopicCategory');for(const c of cats){const o=document.createElement('option');o.value=c.id;o.textContent=c.name||c.title;sel.append(o);}if(koSelectedCategory)sel.value=koSelectedCategory.id;const textarea=el('koTopicMessage');textarea.before(koEmojiToolbar(textarea));el('topicForm').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('[type=submit]');b.disabled=true;const f=new FormData(e.target);const {error}=await client.from('topics').insert({user_id:currentUser.id,category_id:f.get('category_id'),title:String(f.get('title')).trim(),content:String(f.get('content')).trim()});if(error){status('Konu kaydedilemedi: '+error.message);b.disabled=false;return;}closeModal();switchSection('forumSec');await loadTopics();loadStats();};}
+async function openTopicForm(){if(!requireClient())return;if(!currentUser){openAuth(false);return;}const cats=await koCategories();if(!cats.length){alert('Veritabanında kategori bulunamadı. Önce SQL kurulumunu tamamlamalıyız.');return;}openModal('<h2>Yeni Konu Aç</h2><form id="topicForm"><label>Başlık</label><input name="title" maxlength="150" required><label>Kategori</label><select id="koTopicCategory" name="category_id" required></select><label>Mesaj</label><textarea id="koTopicMessage" name="content" rows="7" required></textarea><button class="btn" type="submit">Konuyu Yayınla</button></form>');const sel=el('koTopicCategory');for(const c of cats){const o=document.createElement('option');o.value=c.id;o.textContent=c.name||c.title;sel.append(o);}if(koSelectedCategory?.id)sel.value=koSelectedCategory.id;const textarea=el('koTopicMessage');textarea.before(koEmojiToolbar(textarea));el('topicForm').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('[type=submit]');b.disabled=true;const f=new FormData(e.target);const {error}=await client.from('topics').insert({user_id:currentUser.id,category_id:f.get('category_id'),title:String(f.get('title')).trim(),content:String(f.get('content')).trim()});if(error){status('Konu kaydedilemedi: '+error.message);b.disabled=false;return;}closeModal();koNavigate('forum/kategori/'+encodeURIComponent(koSlug(cats.find(c=>String(c.id)===String(f.get('category_id')))?.name||cats.find(c=>String(c.id)===String(f.get('category_id')))?.title||'')));loadStats();};}
 async function openTopic(topic){
   if(!requireClient())return;
   const id=typeof topic==='object'?topic.id:topic;
@@ -887,7 +885,7 @@ const koOldRefreshAuth=refreshAuth;
 refreshAuth=async function(){await koOldRefreshAuth();const b=el('myProfileButton');if(b)b.hidden=!currentUser;if(currentUser){await koProfiles([currentUser.id]);el('profileName').textContent=koDisplayName(currentUser.id);}};
 koInitCategories();
 
-startApp().then(()=>{if(location.hash.startsWith('#forum'))koRenderRoute();});
+startApp().then(()=>{if(/^#\/?forum(?:\/|$)/.test(location.hash))koRenderRoute();});
 </script>
 <footer class="ko-footer"><strong>KO ARENA</strong> Â· Bağımsız Knight Online oyuncu topluluğu<br>NTTGame ile resmÃ® bağlantısı bulunmamaktadır. Oyun adları ilgili sahiplerinin markalarıdır.</footer>
 <script>
