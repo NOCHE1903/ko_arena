@@ -453,7 +453,7 @@
 .ko-forum-actions .filter-select{min-width:155px;max-width:230px;min-height:38px}
 @media(max-width:650px){.ko-forum-actions{margin-left:0;width:100%}.ko-forum-actions .filter-select{flex:1;min-width:130px}}
 
-/* KO ARENA geliÅŸmiÅŸ Ã§ekiliÅŸ Ã§arkÄ± */
+/* KO ARENA gelişmiş çekiliş çarkı */
 .ko-wheel-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(250px,.8fr);gap:24px;align-items:center;text-align:left}
 .ko-wheel-stage{position:relative;width:min(100%,520px);margin:auto;aspect-ratio:1}
 #koWheelCanvas{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 20px #0009)}
@@ -673,8 +673,8 @@
                     <div class="panel-header"><i class="fa-solid fa-dharmachakra"></i> Canl&#305; &#199;ark &#199;ekili&#351; Arac&#305;</div>
                     <div class="panel-body" style="text-align: center;">
                         <div class="ko-wheel-layout">
-                          <div class="ko-wheel-stage"><div class="ko-wheel-pointer"></div><canvas id="koWheelCanvas" width="600" height="600" aria-label="KatÄ±lÄ±mcÄ± Ã§arkÄ±"></canvas></div>
-                          <div class="ko-wheel-controls"><label for="wheelInput">KatÄ±lÄ±mcÄ±lar (her satÄ±ra veya virgÃ¼lle bir isim)</label><textarea id="wheelInput" class="wheel-input" rows="8" placeholder="Ahmet\nMehmet\nCaner\nZeynep"></textarea><div id="koWheelCount">0 katÄ±lÄ±mcÄ±</div><label class="ko-wheel-check"><input id="koWheelRemove" type="checkbox"> KazananÄ± sonraki turdan Ã§Ä±kar</label><button class="btn" type="button" id="koWheelSpin" onclick="spinWheel()" style="width:100%">Ã‡arkÄ± Ã‡evir</button><button class="btn btn-red" type="button" onclick="koWheelReset()" style="width:100%;margin-top:8px">Ã‡arkÄ± SÄ±fÄ±rla</button><div id="koWheelResult" role="status" aria-live="polite">Ã‡ekiliÅŸ iÃ§in isimleri gir.</div><div id="koWheelHistory"></div></div>
+                          <div class="ko-wheel-stage"><div class="ko-wheel-pointer"></div><canvas id="koWheelCanvas" width="600" height="600" aria-label="Katılımcı çarkı"></canvas></div>
+                          <div class="ko-wheel-controls"><label for="wheelInput">Kat&#305;l&#305;mc&#305;lar (her sat&#305;ra veya virg&#252;lle bir isim)</label><textarea id="wheelInput" class="wheel-input" rows="8" placeholder="Ahmet\nMehmet\nCaner\nZeynep"></textarea><div id="koWheelCount">0 katılımcı</div><label class="ko-wheel-check"><input id="koWheelRemove" type="checkbox"> Kazananı sonraki turdan çıkar</label><button class="btn" type="button" id="koWheelSpin" onclick="spinWheel()" style="width:100%">Çarkı Çevir</button><button class="btn btn-red" type="button" onclick="koWheelReset()" style="width:100%;margin-top:8px">Çarkı Sıfırla</button><div id="koWheelResult" role="status" aria-live="polite">Çekiliş için isimleri gir.</div><div id="koWheelHistory"></div></div>
                         </div>
                     </div>
                 </div>
@@ -801,7 +801,7 @@
             });
         }
 
-        // Ã‡ark modÃ¼lÃ¼ sayfanÄ±n sonunda tanÄ±mlanÄ±r.
+        // Çark modülü sayfanın sonunda tanımlanır.
 
         let currentExp = 420;
         function simulatePostAction() {
@@ -1567,12 +1567,29 @@ document.addEventListener('DOMContentLoaded',loadTopics);
  let rotation=0,spinning=false,history=[];
  const colors=['#a83832','#c68a3d','#375c68','#6a4381','#4b783f','#a65b40','#39528a','#79642e'];
  function names(){return input.value.split(/[,;\n]+/).map(v=>v.trim()).filter(Boolean).slice(0,200)}
- function draw(){const list=names(),n=list.length,w=canvas.width,c=w/2,r=c-15;ctx.clearRect(0,0,w,w);ctx.save();ctx.translate(c,c);ctx.rotate(rotation);if(!n){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle='#1d292d';ctx.fill();ctx.fillStyle='#f4d995';ctx.font='bold 34px Cinzel,serif';ctx.textAlign='center';ctx.fillText('KO ARENA',0,12)}else{const slice=Math.PI*2/n;list.forEach((name,i)=>{const start=-Math.PI/2+i*slice;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,start,start+slice);ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();ctx.strokeStyle='#e9c77a';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.rotate(start+slice/2);ctx.translate(r*.62,0);ctx.rotate(Math.PI/2);ctx.fillStyle='#fff9eb';ctx.textAlign='center';ctx.font=`bold ${Math.max(11,Math.min(22,270/n+10))}px Inter,sans-serif`;const label=name.length>22?name.slice(0,20)+'â€¦':name;ctx.fillText(label,0,0,Math.max(45,r*.65));ctx.restore()})}ctx.restore();ctx.beginPath();ctx.arc(c,c,32,0,Math.PI*2);ctx.fillStyle='#f4d995';ctx.fill();ctx.strokeStyle='#503a20';ctx.lineWidth=7;ctx.stroke();count.textContent=n+' katÄ±lÄ±mcÄ±'+(input.value.split(/[,;\n]+/).filter(x=>x.trim()).length>200?' (ilk 200 kullanÄ±lÄ±yor)':'')}
+ function draw(){const list=names(),n=list.length,w=canvas.width,c=w/2,r=c-15;ctx.clearRect(0,0,w,w);ctx.save();ctx.translate(c,c);ctx.rotate(rotation);if(!n){ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.fillStyle='#1d292d';ctx.fill();ctx.fillStyle='#f4d995';ctx.font='bold 34px Cinzel,serif';ctx.textAlign='center';ctx.fillText('KO ARENA',0,12)}else{const slice=Math.PI*2/n;list.forEach((name,i)=>{const start=-Math.PI/2+i*slice;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,start,start+slice);ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();ctx.strokeStyle='#e9c77a';ctx.lineWidth=2;ctx.stroke();ctx.save();ctx.rotate(start+slice/2);ctx.translate(r*.62,0);ctx.rotate(Math.PI/2);ctx.fillStyle='#fff9eb';ctx.textAlign='center';ctx.font=`bold ${Math.max(11,Math.min(22,270/n+10))}px Inter,sans-serif`;const label=name.length>22?name.slice(0,20)+'…':name;ctx.fillText(label,0,0,Math.max(45,r*.65));ctx.restore()})}ctx.restore();ctx.beginPath();ctx.arc(c,c,32,0,Math.PI*2);ctx.fillStyle='#f4d995';ctx.fill();ctx.strokeStyle='#503a20';ctx.lineWidth=7;ctx.stroke();count.textContent=n+' katılımcı'+(input.value.split(/[,;\n]+/).filter(x=>x.trim()).length>200?' (ilk 200 kullanılıyor)':'')}
  input.addEventListener('input',()=>{if(!spinning)draw()});
- window.koWheelReset=function(){if(spinning)return;rotation=0;history=[];result.textContent='Ã‡ekiliÅŸ iÃ§in isimleri gir.';document.getElementById('koWheelHistory').textContent='';draw()};
- window.spinWheel=function(){if(spinning)return;const list=names();if(list.length<2){result.textContent='Ã‡ark iÃ§in en az 2 katÄ±lÄ±mcÄ± gir.';return}if(!window.crypto?.getRandomValues){result.textContent='GÃ¼venli rastgele seÃ§im bu tarayÄ±cÄ±da kullanÄ±lamÄ±yor.';return}spinning=true;button.disabled=true;input.disabled=true;const random=new Uint32Array(1);const limit=Math.floor(4294967296/list.length)*list.length;do{crypto.getRandomValues(random)}while(random[0]>=limit);const winnerIndex=random[0]%list.length;const slice=2*Math.PI/list.length;const normalized=((rotation%(2*Math.PI))+2*Math.PI)%(2*Math.PI);const target=((2*Math.PI-winnerIndex*slice-slice/2)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);const extra=((target-normalized+2*Math.PI)%(2*Math.PI));const from=rotation,to=rotation+2*Math.PI*7+extra,duration=5200,start=performance.now();result.textContent='Ã‡ark dÃ¶nÃ¼yor...';function frame(now){const t=Math.min(1,(now-start)/duration),ease=1-Math.pow(1-t,4);rotation=from+(to-from)*ease;draw();if(t<1){requestAnimationFrame(frame)}else{rotation=target;draw();result.textContent='Kazanan: '+list[winnerIndex];history.unshift(list[winnerIndex]);document.getElementById('koWheelHistory').textContent='Son kazananlar: '+history.slice(0,10).join(' â€¢ ');spinning=false;button.disabled=false;input.disabled=false;if(document.getElementById('koWheelRemove').checked){const all=input.value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);const idx=all.indexOf(list[winnerIndex]);if(idx>=0)all.splice(idx,1);input.value=all.join('\n');rotation=0;draw()}}}requestAnimationFrame(frame)};
+ window.koWheelReset=function(){if(spinning)return;rotation=0;history=[];result.textContent='Çekiliş için isimleri gir.';document.getElementById('koWheelHistory').textContent='';draw()};
+ window.spinWheel=function(){if(spinning)return;const list=names();if(list.length<2){result.textContent='Çark için en az 2 katılımcı gir.';return}if(!window.crypto?.getRandomValues){result.textContent='Güvenli rastgele seçim bu tarayıcıda kullanılamıyor.';return}spinning=true;button.disabled=true;input.disabled=true;const random=new Uint32Array(1);const limit=Math.floor(4294967296/list.length)*list.length;do{crypto.getRandomValues(random)}while(random[0]>=limit);const winnerIndex=random[0]%list.length;const slice=2*Math.PI/list.length;const normalized=((rotation%(2*Math.PI))+2*Math.PI)%(2*Math.PI);const target=((2*Math.PI-winnerIndex*slice-slice/2)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);const extra=((target-normalized+2*Math.PI)%(2*Math.PI));const from=rotation,to=rotation+2*Math.PI*7+extra,duration=5200,start=performance.now();result.textContent='Çark dönüyor...';function frame(now){const t=Math.min(1,(now-start)/duration),ease=1-Math.pow(1-t,4);rotation=from+(to-from)*ease;draw();if(t<1){requestAnimationFrame(frame)}else{rotation=target;draw();result.innerHTML='&#127881; KAZANAN &#127881;<div class="ko-winner-name"></div>';result.querySelector('.ko-winner-name').textContent=list[winnerIndex];koCelebrateWheel();history.unshift(list[winnerIndex]);document.getElementById('koWheelHistory').textContent='Son kazananlar: '+history.slice(0,10).join(' • ');spinning=false;button.disabled=false;input.disabled=false;if(document.getElementById('koWheelRemove').checked){const all=input.value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);const idx=all.indexOf(list[winnerIndex]);if(idx>=0)all.splice(idx,1);input.value=all.join('\n');rotation=0;draw()}}}requestAnimationFrame(frame)};
  draw();
 })();
+</script>
+
+<style>
+#koWheelResult .ko-winner-name{font-size:clamp(22px,3vw,38px);color:#fff0aa;margin:10px 0;text-shadow:0 0 18px #f7c35b;overflow-wrap:anywhere}
+#koConfettiOverlay{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:99999}
+</style>
+<script>
+function koCelebrateWheel(){
+ const old=document.getElementById('koConfettiOverlay');if(old)old.remove();
+ const overlay=document.createElement('canvas');overlay.id='koConfettiOverlay';document.body.appendChild(overlay);
+ const ctx=overlay.getContext('2d');if(!ctx)return;
+ const dpr=Math.min(window.devicePixelRatio||1,2),w=innerWidth,h=innerHeight;
+ overlay.width=Math.round(w*dpr);overlay.height=Math.round(h*dpr);ctx.scale(dpr,dpr);
+ const palette=['#f8d36d','#e94f55','#69d2e7','#b78cff','#7be69a','#ffffff'];
+ const particles=Array.from({length:190},()=>({x:Math.random()*w,y:-Math.random()*h*.7-20,vx:(Math.random()-.5)*5,vy:2+Math.random()*5,rot:Math.random()*6.28,vr:(Math.random()-.5)*.2,size:5+Math.random()*9,color:palette[Math.floor(Math.random()*palette.length)]}));
+ const start=performance.now();function animate(now){ctx.clearRect(0,0,w,h);for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/3,p.size,p.size*.65);ctx.restore()}if(now-start<4500)requestAnimationFrame(animate);else overlay.remove()}requestAnimationFrame(animate);
+}
 </script>
 </body>
 </html>
