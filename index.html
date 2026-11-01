@@ -1012,7 +1012,7 @@
 #koAuthDialog input{display:block;width:100%;padding:11px;background:#080d11;color:white;border:1px solid #766441;border-radius:3px}#koAuthDialog .ko-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
 #koAuthMessage{font-size:12px;line-height:1.5;margin-top:12px;color:#f1c97b;overflow-wrap:anywhere}
 
-/* KO ARENA profil menÃ¼sÃ¼ */
+/* KO ARENA profil men&#252;s&#252; */
 .ko-user-menu{position:relative;display:flex;align-items:center;gap:8px}
 .ko-user-trigger{display:flex;align-items:center;gap:8px;text-transform:none;max-width:230px}
 .ko-user-trigger img{width:26px;height:26px;object-fit:cover;border-radius:50%;border:1px solid #b99b5a}
@@ -1031,14 +1031,14 @@
 <label for="koPassword">&#350;ifre</label><input id="koPassword" name="password" type="password" minlength="6" required autocomplete="current-password">
 <div class="ko-actions"><button class="btn" id="koAuthSubmit" type="submit">Giri&#351; Yap</button><button class="btn btn-red" id="koAuthSwitch" type="button">Kay&#305;t Ol</button><button class="btn" id="koAuthClose" type="button">Kapat</button></div></form><p id="koAuthMessage" role="status"></p></div></div>
 
-<div id="koProfileOverlay"><div id="koProfileDialog" role="dialog" aria-modal="true" aria-label="Profil ayarlarÄ±">
+<div id="koProfileOverlay"><div id="koProfileDialog" role="dialog" aria-modal="true" aria-label="Profil ayarlar&#305;">
 <h2>Profilim</h2><p id="koProfileInfo" style="color:#d4c4a3;font-size:12px;line-height:1.7"></p>
-<form id="koProfileForm"><label for="koProfileName">KullanÄ±cÄ± adÄ±</label><input id="koProfileName" minlength="3" maxlength="30" required autocomplete="nickname">
-<label for="koProfileAvatar">Profil fotoÄŸrafÄ± baÄŸlantÄ±sÄ± (isteÄŸe baÄŸlÄ±)</label><input id="koProfileAvatar" type="url" maxlength="500" placeholder="https://..." autocomplete="url">
+<form id="koProfileForm"><label for="koProfileName">Kullan&#305;c&#305; ad&#305;</label><input id="koProfileName" minlength="3" maxlength="30" required autocomplete="nickname">
+<label for="koProfileAvatar">Profil fotoÄŸrafÄ± yÃ¼kle (isteÄŸe baÄŸlÄ±)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">BilgisayarÄ±ndan JPG, PNG veya WebP seÃ§. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil fotoÄŸrafÄ± Ã¶nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
 <div class="ko-actions"><button type="submit" class="btn">Profili Kaydet</button><button type="button" class="btn" id="koProfileClose">Kapat</button></div></form>
-<form id="koPasswordForm" style="margin-top:20px;padding-top:15px;border-top:1px solid #66563c"><h3 style="color:#f4d995;font-size:14px">Åifre DeÄŸiÅŸtir</h3>
-<label for="koNewPassword">Yeni ÅŸifre (en az 6 karakter)</label><input id="koNewPassword" type="password" minlength="6" required autocomplete="new-password">
-<div class="ko-actions"><button type="submit" class="btn">Åifreyi GÃ¼ncelle</button></div></form>
+<form id="koPasswordForm" style="margin-top:20px;padding-top:15px;border-top:1px solid #66563c"><h3 style="color:#f4d995;font-size:14px">&#350;ifre De&#287;i&#351;tir</h3>
+<label for="koNewPassword">Yeni &#351;ifre (en az 6 karakter)</label><input id="koNewPassword" type="password" minlength="6" required autocomplete="new-password">
+<div class="ko-actions"><button type="submit" class="btn">&#350;ifreyi G&#252;ncelle</button></div></form>
 <p id="koProfileMessage" role="status"></p></div></div>
 <script>
 (function(){
@@ -1060,41 +1060,54 @@ const profileOverlay=document.getElementById('koProfileOverlay');
 const profileMessage=document.getElementById('koProfileMessage');
 const profileName=document.getElementById('koProfileName');
 const profileAvatar=document.getElementById('koProfileAvatar');
+const avatarPreview=document.getElementById('koAvatarPreview');
+let savedAvatarUrl='';
+profileAvatar.addEventListener('change',()=>{const file=profileAvatar.files?.[0];if(!file){avatarPreview.style.display='none';return;}if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>2*1024*1024){profileMessage.textContent='YalnÄ±zca JPG, PNG veya WebP (en fazla 2 MB) seÃ§ebilirsin.';profileAvatar.value='';return;}avatarPreview.src=URL.createObjectURL(file);avatarPreview.style.display='block';});
 let profileExp=null;
-const rankFor=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'GÃ¼mÃ¼ÅŸ':exp>=500?'Bronz':exp>=100?'Ã‡aylak':'Yeni Ãœye';
+const rankFor=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'G\u00fcm\u00fc\u015f':exp>=500?'Bronz':exp>=100?'\u00c7aylak':'Yeni \u00dcye';
 async function openProfile(focusPassword=false){
  if(!client)return;
  const {data:{user},error}=await client.auth.getUser();if(error||!user){window.koOpenAuth(false);return;}
  profileMessage.textContent='';profileName.value=user.user_metadata?.username||user.email?.split('@')[0]||'';
- profileAvatar.value=user.user_metadata?.avatar_url||'';
+ profileAvatar.value='';savedAvatarUrl=user.user_metadata?.avatar_url||'';
  const {data:row}=await client.from('profiles').select('username,exp').eq('id',user.id).maybeSingle();
  if(row){if(row.username)profileName.value=row.username;profileExp=row.exp;}
  else profileExp=null;
  const {data:forumRow}=await client.from('forum_profiles').select('avatar_url').eq('user_id',user.id).maybeSingle();
- if(forumRow?.avatar_url)profileAvatar.value=forumRow.avatar_url;
- document.getElementById('koProfileInfo').textContent='E-posta: '+user.email+(profileExp!==null?' | EXP: '+profileExp+' | RÃ¼tbe: '+rankFor(profileExp):'');
+ if(forumRow?.avatar_url)savedAvatarUrl=forumRow.avatar_url;
+ avatarPreview.style.display=savedAvatarUrl?'block':'none';if(savedAvatarUrl)avatarPreview.src=savedAvatarUrl;
+ document.getElementById('koProfileInfo').textContent='E-posta: '+user.email+(profileExp!==null?' | EXP: '+profileExp+' | R\u00fctbe: '+rankFor(profileExp):'');
  profileOverlay.classList.add('ko-open');if(focusPassword)document.getElementById('koNewPassword').focus();
 }
 document.getElementById('koProfileClose').onclick=()=>profileOverlay.classList.remove('ko-open');
 profileOverlay.addEventListener('click',e=>{if(e.target===profileOverlay)profileOverlay.classList.remove('ko-open');});
 document.getElementById('koProfileForm').onsubmit=async e=>{
  e.preventDefault();const {data:{user}}=await client.auth.getUser();if(!user)return;
- const username=profileName.value.trim(),avatar_url=profileAvatar.value.trim();
- if(username.length<3){profileMessage.textContent='KullanÄ±cÄ± adÄ± en az 3 karakter olmalÄ±.';return;}
+ const username=profileName.value.trim();let avatar_url=savedAvatarUrl;const avatarFile=profileAvatar.files?.[0];
+ if(username.length<3){profileMessage.textContent='Kullan\u0131c\u0131 ad\u0131 en az 3 karakter olmal\u0131.';return;}
  const button=e.submitter;if(button)button.disabled=true;profileMessage.textContent='Kaydediliyor...';
  try{
+  if(avatarFile){
+   if(!['image/png','image/jpeg','image/webp'].includes(avatarFile.type)||avatarFile.size>2*1024*1024)throw Error('FotoÄŸraf JPG, PNG veya WebP olmalÄ± ve 2 MB sÄ±nÄ±rÄ±nÄ± aÅŸmamalÄ±.');
+   profileMessage.textContent='FotoÄŸraf yÃ¼kleniyor...';
+   const ext=avatarFile.type==='image/png'?'png':avatarFile.type==='image/webp'?'webp':'jpg';
+   const path=user.id+'/'+crypto.randomUUID()+'.'+ext;
+   const {error:uploadError}=await client.storage.from('avatars').upload(path,avatarFile,{contentType:avatarFile.type,upsert:false});
+   if(uploadError)throw Error('FotoÄŸraf yÃ¼klenemedi: '+uploadError.message+' (Supabase avatars deposunu kontrol et.)');
+   avatar_url=client.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  }
   const {error:authError}=await client.auth.updateUser({data:{username,avatar_url}});if(authError)throw authError;
   const {error:profileError}=await client.from('profiles').update({username}).eq('id',user.id);
   const {error:forumError}=await client.from('forum_profiles').update({display_name:username,avatar_url:avatar_url||null}).eq('user_id',user.id);
-  await renderUser();
-  profileMessage.textContent=profileError||forumError?'Hesap bilgileri kaydedildi; forum profilinin tamamÄ± gÃ¼ncellenemedi. VeritabanÄ± izinleri kontrol edilmeli.':'Profil gÃ¼ncellendi!';
+  savedAvatarUrl=avatar_url;profileAvatar.value='';await renderUser();
+  profileMessage.textContent=profileError||forumError?'Hesap bilgileri kaydedildi; forum profilinin tamam\u0131 g\u00fcncellenemedi. Veritaban\u0131 izinleri kontrol edilmeli.':'Profil g\u00fcncellendi!';
  }catch(err){profileMessage.textContent='Kaydedilemedi: '+(err.message||'Bilinmeyen hata');}finally{if(button)button.disabled=false;}
 };
 document.getElementById('koPasswordForm').onsubmit=async e=>{
  e.preventDefault();const button=e.submitter;if(button)button.disabled=true;
- profileMessage.textContent='Åifre gÃ¼ncelleniyor...';
- try{const {error}=await client.auth.updateUser({password:document.getElementById('koNewPassword').value});if(error)throw error;document.getElementById('koNewPassword').value='';profileMessage.textContent='Åifre gÃ¼ncellendi.';}
- catch(err){profileMessage.textContent='Åifre gÃ¼ncellenemedi: '+(err.message||'Bilinmeyen hata');}finally{if(button)button.disabled=false;}
+ profileMessage.textContent='\u015eifre g\u00fcncelleniyor...';
+ try{const {error}=await client.auth.updateUser({password:document.getElementById('koNewPassword').value});if(error)throw error;document.getElementById('koNewPassword').value='';profileMessage.textContent='\u015eifre g\u00fcncellendi.';}
+ catch(err){profileMessage.textContent='\u015eifre g\u00fcncellenemedi: '+(err.message||'Bilinmeyen hata');}finally{if(button)button.disabled=false;}
 };
 async function renderUser(){
  if(!client)return;const {data:{user}}=await client.auth.getUser();authBox.replaceChildren();
@@ -1103,16 +1116,16 @@ async function renderUser(){
   const trigger=document.createElement('button');trigger.type='button';trigger.className='btn ko-user-trigger';
   const avatar=user.user_metadata?.avatar_url;
   if(avatar&&/^https:\/\//i.test(avatar)){const img=document.createElement('img');img.src=avatar;img.alt='';img.referrerPolicy='no-referrer';trigger.appendChild(img);}
-  const name=document.createElement('span');name.textContent=user.user_metadata?.username||user.email||'Ãœye';trigger.appendChild(name);
+  const name=document.createElement('span');name.textContent=user.user_metadata?.username||user.email||'\u00dcye';trigger.appendChild(name);
   const arrow=document.createElement('i');arrow.className='fa-solid fa-chevron-down';trigger.appendChild(arrow);
   const menu=document.createElement('div');menu.className='ko-user-dropdown';menu.hidden=true;
   trigger.setAttribute('aria-expanded','false');trigger.onclick=()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden));};
-  for(const [label,action] of [['Profilim',()=>openProfile()],['Profili DÃ¼zenle',()=>openProfile()],['Åifre DeÄŸiÅŸtir',()=>openProfile(true)],['Ã‡Ä±kÄ±ÅŸ Yap',async()=>{const {error}=await client.auth.signOut();if(error)alert(error.message);else{profileOverlay.classList.remove('ko-open');renderUser();}}]]){
+  for(const [label,action] of [['Profilim',()=>openProfile()],['Profili D\u00fczenle',()=>openProfile()],['\u015eifre De\u011fi\u015ftir',()=>openProfile(true)],['\u00c7\u0131k\u0131\u015f Yap',async()=>{const {error}=await client.auth.signOut();if(error)alert(error.message);else{profileOverlay.classList.remove('ko-open');renderUser();}}]]){
    const item=document.createElement('button');item.type='button';item.textContent=label;item.onclick=()=>{menu.hidden=true;action();};menu.appendChild(item);
   }
   wrap.append(trigger,menu);authBox.appendChild(wrap);
   document.addEventListener('click',e=>{if(!wrap.contains(e.target))menu.hidden=true;},{signal:menuAbortSignal()});
- }else{for(const [label,mode] of [['GiriÅŸ Yap',false],['KayÄ±t Ol',true]]){const btn=document.createElement('button');btn.className=mode?'btn btn-red':'btn';btn.textContent=label;btn.onclick=()=>window.koOpenAuth(mode);authBox.append(btn);}}
+ }else{for(const [label,mode] of [['Giri\u015f Yap',false],['Kay\u0131t Ol',true]]){const btn=document.createElement('button');btn.className=mode?'btn btn-red':'btn';btn.textContent=label;btn.onclick=()=>window.koOpenAuth(mode);authBox.append(btn);}}
 }
 let menuController;
 function menuAbortSignal(){if(menuController)menuController.abort();menuController=new AbortController();return menuController.signal;}
