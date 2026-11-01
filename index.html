@@ -440,6 +440,11 @@
         .ko-create-topic-top{display:flex;justify-content:flex-end;margin:0 0 12px}
         .ko-create-topic-top .btn{font-size:13px;padding:10px 18px;min-height:40px}
         @media(max-width:600px){.ko-create-topic-top .btn{width:100%}}
+
+.ko-announcement-title{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px 8px 15px;background:#2a2822;border-bottom:1px solid #80683f;color:#f2d391;font-weight:800;font-size:13px}
+.ko-announcement-title .btn{padding:8px 14px;font-size:11px}
+#koServerForumSelect{margin-left:auto;min-width:160px;max-width:230px}
+@media(max-width:600px){.ko-announcement-title{flex-wrap:wrap}.ko-announcement-title .btn{width:100%}#koServerForumSelect{width:100%;max-width:none}}
 </style>
 </head>
 <body>
@@ -519,7 +524,7 @@
             
             <!-- 1. FORUM & SERVERLER B&#214;L&#220;M&#220; -->
             <div id="forumSec" class="content-section active">
-                <div class="ko-create-topic-top"><button type="button" class="btn" onclick="simulatePostAction()"><i class="fa-solid fa-pen-nib"></i> Konu A&#231; / Mesaj At (+EXP)</button></div>
+                
                 <div class="ko-feature-grid">
             <!-- TWITCH YAYINCI V&#304;TR&#304;N&#304; -->
             <div class="panel-box" id="twitchPanel">
@@ -553,26 +558,19 @@
 
                 
                 <div class="sub-nav-tabs" role="tablist" aria-label="Forum kategorileri">
-                    <button type="button" class="sub-tab active" data-forum-tab="duyurular" onclick="showForumTab('duyurular')">Genel Duyurular</button>
-                    <button type="button" class="sub-tab" data-forum-tab="cz" onclick="showForumTab('cz')">Colony Zone Polemik</button>
-                    <button type="button" class="sub-tab" data-forum-tab="zero" onclick="showForumTab('zero')">Server: Zero</button>
-                    <button type="button" class="sub-tab" data-forum-tab="agartha" onclick="showForumTab('agartha')">Server: Agartha</button>
+                    <button type="button" class="sub-tab active" data-forum-tab="duyurular" onclick="showForumTab('duyurular')">Duyuru</button>
+                    <button type="button" class="sub-tab" data-forum-tab="cz" onclick="showForumTab('cz')">Knight Online Genel</button>
+                <select id="koServerForumSelect" class="filter-select" aria-label="Sunucu forumu seÃ§" onchange="koSelectServerForum(this.value)"><option value="">Sunucu SeÃ§</option></select>
                 </div>
                 <div class="forum-tab-panel" data-forum-panel="duyurular">
                     <div class="forum-category-list">
-                        <div class="forum-category-heading"><i class="fa-solid fa-bullhorn"></i> Resm&#238; Duyurular ve G&#252;ncellemeler</div>
+                        <div class="ko-announcement-title"><span><i class="fa-solid fa-bullhorn"></i> Duyuru</span><button type="button" class="btn" onclick="koOpenNewTopic()"><i class="fa-solid fa-pen-nib"></i> Yeni Konu AÃ§</button></div>
                         <button type="button" class="forum-category-row ko-topic-button" onclick="openKoTopic('2026 Sezonu Kapsaml&#305; Bak&#305;m ve Etkinlik Yama Notlar&#305;','NOCHE Admin','Bu ba&#351;l&#305;k hen&#252;z i&#231;erikle doldurulmad&#305;. Ger&#231;ek forum veritaban&#305; ba&#287;land&#305;&#287;&#305;nda duyurular burada yay&#305;nlanacak.')">
                             <i class="fa-solid fa-scroll"></i><span><strong>2026 Sezonu Kapsaml&#305; Bak&#305;m ve Etkinlik Yama Notlar&#305;</strong><small>Yay&#305;nlayan: NOCHE Admin | Resm&#238; Bilgilendirme</small></span>
                         </button>
                     </div>
                 </div>
-                <div class="forum-tab-panel" data-forum-panel="cz" hidden>
-                    <div class="forum-category-list">
-                        <div class="forum-category-heading"><i class="fa-solid fa-fire"></i> Colony Zone Tart&#305;&#351;malar&#305;</div>
-                        <button type="button" class="forum-category-row ko-topic-button" onclick="openKoTopic('CZ Bowl D&#246;n&#252;&#351;leri ve Mage / Melee Denge Tart&#305;&#351;mas&#305;','CZ_King','Bu ba&#351;l&#305;k &#246;rnek i&#231;eriktir. Yorumlar hen&#252;z veritaban&#305;na ba&#287;l&#305; de&#287;il.')"><i class="fa-solid fa-shield-halved"></i><span><strong>CZ Bowl D&#246;n&#252;&#351;leri ve Mage / Melee Denge Tart&#305;&#351;mas&#305;</strong><small>Genel Tart&#305;&#351;ma</small></span></button>
-                        <button type="button" class="forum-category-row ko-topic-button" onclick="openKoTopic('En Verimli Farm Slotlar&#305;','SlotMaster','Bu ba&#351;l&#305;k &#246;rnek i&#231;eriktir. Ger&#231;ek forum ba&#287;lant&#305;s&#305; sonraki a&#351;amada kurulacak.')"><i class="fa-solid fa-coins"></i><span><strong>En Verimli Farm Slotlar&#305;</strong><small>Rehberler ve farm</small></span></button>
-                    </div>
-                </div>
+                <div class="forum-tab-panel" data-forum-panel="cz" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-comments"></i> Knight Online Genel</div><div class="ko-forum-empty">Genel tartÄ±ÅŸmalar burada yer alacak. Konu oluÅŸturma veritabanÄ± baÄŸlantÄ±sÄ± sonraki adÄ±mda tamamlanacak.</div></div></div>
                 <div class="forum-tab-panel" data-forum-panel="zero" hidden>
                     <div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-server"></i> Zero Sunucu Forumu</div><div class="ko-forum-empty">Zero sunucusu i&#231;in hen&#252;z konu a&#231;&#305;lmad&#305;. &#220;yelik ve forum veritaban&#305; ba&#287;land&#305;&#287;&#305;nda burada oyuncu konular&#305; g&#246;sterilecek.</div></div>
                 </div>
@@ -1133,6 +1131,14 @@ function menuAbortSignal(){if(menuController)menuController.abort();menuControll
 form.onsubmit=async e=>{e.preventDefault();if(!client){message.textContent='Ba\u011flant\u0131 k\u00fct\u00fcphanesi y\u00fcklenemedi. \u0130nternet ba\u011flant\u0131n\u0131z\u0131 kontrol edin.';return;}const btn=document.getElementById('koAuthSubmit');btn.disabled=true;message.textContent='\u0130\u015flem yap\u0131l\u0131yor...';try{const email=form.email.value.trim();const password=form.password.value;let result;if(signup){const username=document.getElementById('koUsername').value.trim();if(username.length<3)throw Error('Kullan\u0131c\u0131 ad\u0131 en az 3 karakter olmal\u0131.');result=await client.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://noche1903.github.io/ko_arena/'}});}else result=await client.auth.signInWithPassword({email,password});if(result.error)throw result.error;if(signup&&!result.data.session){message.textContent='Kay\u0131t al\u0131nd\u0131. E-posta do\u011frulama ba\u011flant\u0131s\u0131n\u0131 kontrol et.';}else{overlay.classList.remove('ko-open');form.reset();await renderUser();}}catch(err){message.textContent=err.message||'\u0130\u015flem ba\u015far\u0131s\u0131z.';}finally{btn.disabled=false;}};
 if(client){client.auth.onAuthStateChange(()=>setTimeout(renderUser,0));renderUser();}else message.textContent='Supabase y\u00fcklenemedi.';
 })();
+</script>
+<script>
+// GÃ¶rsel sunucu seÃ§imi. YÃ¶netici tarafÄ±ndan herkese aÃ§Ä±k yÃ¶netim iÃ§in Supabase tablosu sonraki adÄ±mda baÄŸlanacak.
+const koForumServers=['Zero','Agartha'];
+function koPopulateServerForums(){const el=document.getElementById('koServerForumSelect');if(!el)return;for(const name of koForumServers){const opt=document.createElement('option');opt.value=name.toLowerCase();opt.textContent='Server: '+name;el.appendChild(opt);}}
+function koSelectServerForum(value){if(!value)return;showForumTab(value);}
+function koOpenNewTopic(){alert('Yeni konu oluÅŸturma henÃ¼z veritabanÄ±na baÄŸlÄ± deÄŸil. Bir sonraki adÄ±mda gerÃ§ek konu oluÅŸturma formunu kuracaÄŸÄ±z.');}
+document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 </script>
 </body>
 </html>
