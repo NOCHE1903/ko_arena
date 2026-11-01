@@ -445,6 +445,13 @@
 .ko-announcement-title .btn{padding:8px 14px;font-size:11px}
 #koServerForumSelect{margin-left:auto;min-width:160px;max-width:230px}
 @media(max-width:600px){.ko-announcement-title{flex-wrap:wrap}.ko-announcement-title .btn{width:100%}#koServerForumSelect{width:100%;max-width:none}}
+
+/* Forum sekmeleri ile konu a&#231;ma ve sunucu se&#231;imi ayn&#305; sat&#305;rda */
+.sub-nav-tabs{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.ko-forum-actions{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.ko-forum-actions .ko-new-topic-btn{white-space:nowrap;background:linear-gradient(#b99a58,#80622f);color:#111;border-color:#e1c17b}
+.ko-forum-actions .filter-select{min-width:155px;max-width:230px;min-height:38px}
+@media(max-width:650px){.ko-forum-actions{margin-left:0;width:100%}.ko-forum-actions .filter-select{flex:1;min-width:130px}}
 </style>
 </head>
 <body>
@@ -560,17 +567,17 @@
                 <div class="sub-nav-tabs" role="tablist" aria-label="Forum kategorileri">
                     <button type="button" class="sub-tab active" data-forum-tab="duyurular" onclick="showForumTab('duyurular')">Duyuru</button>
                     <button type="button" class="sub-tab" data-forum-tab="cz" onclick="showForumTab('cz')">Knight Online Genel</button>
-                <select id="koServerForumSelect" class="filter-select" aria-label="Sunucu forumu seÃ§" onchange="koSelectServerForum(this.value)"><option value="">Sunucu SeÃ§</option></select>
+                    <div class="ko-forum-actions"><button type="button" class="btn ko-new-topic-btn" onclick="koOpenNewTopic()"><i class="fa-solid fa-pen-nib"></i> YEN&#304; KONU A&#199;</button><select id="koServerForumSelect" class="filter-select" aria-label="Sunucu forumu se&#231;" onchange="koSelectServerForum(this.value)"><option value="">Sunucu Se&#231;</option></select></div>
                 </div>
                 <div class="forum-tab-panel" data-forum-panel="duyurular">
                     <div class="forum-category-list">
-                        <div class="ko-announcement-title"><span><i class="fa-solid fa-bullhorn"></i> Duyuru</span><button type="button" class="btn" onclick="koOpenNewTopic()"><i class="fa-solid fa-pen-nib"></i> Yeni Konu AÃ§</button></div>
+                        <div class="ko-announcement-title"><span><i class="fa-solid fa-bullhorn"></i> Duyuru</span></div>
                         <button type="button" class="forum-category-row ko-topic-button" onclick="openKoTopic('2026 Sezonu Kapsaml&#305; Bak&#305;m ve Etkinlik Yama Notlar&#305;','NOCHE Admin','Bu ba&#351;l&#305;k hen&#252;z i&#231;erikle doldurulmad&#305;. Ger&#231;ek forum veritaban&#305; ba&#287;land&#305;&#287;&#305;nda duyurular burada yay&#305;nlanacak.')">
                             <i class="fa-solid fa-scroll"></i><span><strong>2026 Sezonu Kapsaml&#305; Bak&#305;m ve Etkinlik Yama Notlar&#305;</strong><small>Yay&#305;nlayan: NOCHE Admin | Resm&#238; Bilgilendirme</small></span>
                         </button>
                     </div>
                 </div>
-                <div class="forum-tab-panel" data-forum-panel="cz" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-comments"></i> Knight Online Genel</div><div class="ko-forum-empty">Genel tartÄ±ÅŸmalar burada yer alacak. Konu oluÅŸturma veritabanÄ± baÄŸlantÄ±sÄ± sonraki adÄ±mda tamamlanacak.</div></div></div>
+                <div class="forum-tab-panel" data-forum-panel="cz" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-comments"></i> Knight Online Genel</div><div class="ko-forum-empty">Genel tart&#305;&#351;malar burada yer alacak. Konu olu&#351;turma veritaban&#305; ba&#287;lant&#305;s&#305; sonraki ad&#305;mda tamamlanacak.</div></div></div>
                 <div class="forum-tab-panel" data-forum-panel="zero" hidden>
                     <div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-server"></i> Zero Sunucu Forumu</div><div class="ko-forum-empty">Zero sunucusu i&#231;in hen&#252;z konu a&#231;&#305;lmad&#305;. &#220;yelik ve forum veritaban&#305; ba&#287;land&#305;&#287;&#305;nda burada oyuncu konular&#305; g&#246;sterilecek.</div></div>
                 </div>
@@ -1032,7 +1039,7 @@
 <div id="koProfileOverlay"><div id="koProfileDialog" role="dialog" aria-modal="true" aria-label="Profil ayarlar&#305;">
 <h2>Profilim</h2><p id="koProfileInfo" style="color:#d4c4a3;font-size:12px;line-height:1.7"></p>
 <form id="koProfileForm"><label for="koProfileName">Kullan&#305;c&#305; ad&#305;</label><input id="koProfileName" minlength="3" maxlength="30" required autocomplete="nickname">
-<label for="koProfileAvatar">Profil fotoÄŸrafÄ± yÃ¼kle (isteÄŸe baÄŸlÄ±)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">BilgisayarÄ±ndan JPG, PNG veya WebP seÃ§. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil fotoÄŸrafÄ± Ã¶nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
+<label for="koProfileAvatar">Profil foto&#287;raf&#305; y&#252;kle (iste&#287;e ba&#287;l&#305;)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">BilgisayarÄ±ndan JPG, PNG veya WebP seÃ§. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil fotoÄŸrafÄ± Ã¶nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
 <div class="ko-actions"><button type="submit" class="btn">Profili Kaydet</button><button type="button" class="btn" id="koProfileClose">Kapat</button></div></form>
 <form id="koPasswordForm" style="margin-top:20px;padding-top:15px;border-top:1px solid #66563c"><h3 style="color:#f4d995;font-size:14px">&#350;ifre De&#287;i&#351;tir</h3>
 <label for="koNewPassword">Yeni &#351;ifre (en az 6 karakter)</label><input id="koNewPassword" type="password" minlength="6" required autocomplete="new-password">
