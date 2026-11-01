@@ -378,27 +378,6 @@ footer.ko-footer{max-width:1470px;margin:20px auto 0;padding:26px 20px 40px;bord
 #forumBreadcrumb{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 15px;margin-bottom:10px;background:#18242a;border:1px solid #66563c;color:#f1d397;font-weight:700}
 .ko-post{display:grid;grid-template-columns:180px minmax(0,1fr);border:1px solid #66563c;background:#121c20;margin:12px 0;min-height:150px}.ko-post-author{border-right:1px solid #66563c;padding:18px 10px;text-align:center;background:#1b2527}.ko-post-author strong{display:block;overflow-wrap:anywhere}.ko-post-message{padding:20px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}.ko-avatar{width:76px;height:76px;object-fit:cover;border-radius:50%;border:2px solid #cda95e;background:#273137;display:block;margin:0 auto 10px}.ko-avatar.sm{width:42px;height:42px;margin:0}.ko-topic-title{font-size:20px;color:#f4d89e;margin:8px 0}.ko-emoji-bar{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}.ko-emoji-bar button{background:#27343a;color:#fff;border:1px solid #6d624b;padding:5px 9px;cursor:pointer;border-radius:4px}.ko-profile-panel{padding:20px;background:#152126;border:1px solid #66563c}.ko-profile-panel input,.ko-profile-panel textarea{width:100%;background:#080e12;color:#fff;border:1px solid #66563c;padding:11px;margin:6px 0 12px}.ko-author-mini{display:flex;align-items:center;gap:10px;margin:10px 0;color:#f2d391}.ko-post-author .team-crest{justify-content:center;margin-top:8px}.ko-forum-actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.modal-box.ko-wide-modal{width:min(1000px,96vw)}
 @media(max-width:650px){.ko-post{grid-template-columns:1fr}.ko-post-author{border-right:0;border-bottom:1px solid #66563c;display:flex;align-items:center;gap:10px;text-align:left;padding:10px}.ko-post-author .ko-avatar{width:46px;height:46px;margin:0}.ko-post-message{padding:14px}}
-
-/* Forum sayfa geçişi: ana sayfa, kategori, konu ayrı görünür */
-#forumSec.ko-category-page .hero-banner-portal,#forumSec.ko-category-page .ko-ad-wrap,#forumSec.ko-category-page .forum-category-list,#forumSec.ko-category-page .sub-nav-tabs{display:none!important}
-#forumSec.ko-topic-page .hero-banner-portal,#forumSec.ko-topic-page .ko-ad-wrap,#forumSec.ko-topic-page .forum-category-list,#forumSec.ko-topic-page .sub-nav-tabs,#forumSec.ko-topic-page #forumBreadcrumb,#forumSec.ko-topic-page #forumResults{display:none!important}
-#koInlineTopic{display:none}#forumSec.ko-topic-page #koInlineTopic{display:block}
-.ko-path{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:15px;color:#f2d391}.ko-path button{background:transparent;color:#f2d391;border:0;cursor:pointer;font-weight:700}.ko-path button:hover{text-decoration:underline}
-
-/* KO ARENA: tam ekran forum kategori / konu gezinimi */
-#forumSec.ko-category-page > .hero-banner-portal,
-#forumSec.ko-category-page > .ko-ad-wrap,
-#forumSec.ko-category-page > #koCategoryHome,
-#forumSec.ko-category-page > .sub-nav-tabs,
-#forumSec.ko-topic-page > .hero-banner-portal,
-#forumSec.ko-topic-page > .ko-ad-wrap,
-#forumSec.ko-topic-page > #koCategoryHome,
-#forumSec.ko-topic-page > .sub-nav-tabs {display:none!important}
-#forumSec.ko-category-page #forumBreadcrumb {display:flex!important}
-#forumSec.ko-topic-page #koInlineTopic {display:block!important}
-#forumSec.ko-topic-page #forumResults,
-#forumSec.ko-topic-page #forumBreadcrumb {display:none!important}
-#forumSec.ko-category-page #koInlineTopic {display:none!important}
 </style>
 </head>
 <body>
@@ -424,7 +403,7 @@ footer.ko-footer{max-width:1470px;margin:20px auto 0;padding:26px 20px 40px;bord
         </div>
         
         <ul class="nav-menu">
-            <li><a onclick="switchSection('forumSec')" class="active" id="btnForum"><i class="fa-solid fa-comments"></i> Forum & Serverler</a></li>
+            <li><a onclick="koGoHome()" class="active" id="btnForum"><i class="fa-solid fa-comments"></i> Forum & Serverler</a></li>
             <li><a onclick="switchSection('pazarSec')" id="btnPazar"><i class="fa-solid fa-store"></i> Pazar & İlanlar</a></li>
             <li><a onclick="switchSection('etkinlikSec')" id="btnEtkinlik"><i class="fa-solid fa-dharmachakra"></i> Çark & Etkinlik</a></li>
         </ul>
@@ -472,8 +451,8 @@ footer.ko-footer{max-width:1470px;margin:20px auto 0;padding:26px 20px 40px;bord
                     <div class="forum-category-row"><i class="fa-solid fa-circle-question"></i><div><strong>Şikâyet ve Destek</strong><span>Yardım talepleri, sorunlar ve şikâyetler</span></div></div>
                     <div class="forum-category-row"><i class="fa-solid fa-bullhorn"></i><div><strong>Duyurular</strong><span>Topluluk ve forum duyuruları</span></div></div>
                 </div>
-                <div class="sub-nav-tabs"><button class="sub-tab active" onclick="koGoHome()">Son Konular</button><button class="sub-tab" onclick="openTopicForm()">+ Yeni Konu Aç</button></div>
-                <div id="forumBreadcrumb" hidden></div><div id="forumResults" aria-live="polite">Konular yükleniyor...</div><div id="koInlineTopic"></div>
+                <div id="koForumTabs" class="sub-nav-tabs"><button class="sub-tab active" onclick="koGoHome()">Son Konular</button><button class="sub-tab" onclick="openTopicForm()">+ Yeni Konu Aç</button></div>
+                <div id="forumBreadcrumb" hidden></div><div id="forumResults" aria-live="polite">Konular yükleniyor...</div><div id="koTopicPage" hidden></div>
             </div>
 
             <div id="profileSec" class="content-section"><div class="hero-banner-portal"><h1>PROFİLİM</h1><p>KO ARENA oyuncu kimliğin</p></div><div id="profileContent"></div></div>
@@ -696,9 +675,6 @@ async function openAdmin(){if(!currentUser||!isAdmin){alert('Yönetici yetkisi g
  }
 }
 
-async function koLegacyLoadTopics(){if(!client)return;const target=el('forumResults');target.textContent='Konular yükleniyor...';const {data,error}=await client.from('topics').select('id,title,content,user_id,created_at').order('created_at',{ascending:false}).limit(40);target.replaceChildren();if(error){target.textContent='Konular alınamadı: '+error.message;return;}if(!data?.length){target.textContent='Henüz konu yok. İlk konuyu sen aç!';return;}await loadAuthorTeams(data.map(t=>t.user_id));for(const topic of data){const card=document.createElement('div');card.className='forum-card-box';const main=document.createElement('div');main.className='card-main-info';const wrap=document.createElement('div');const title=document.createElement('div');title.className='card-title';title.textContent=topic.title;const body=document.createElement('div');body.className='card-desc';body.textContent=String(topic.content||'').slice(0,200);const meta=document.createElement('div');meta.className='card-desc';meta.textContent=new Date(topic.created_at).toLocaleDateString('tr-TR');wrap.append(title,body,meta);main.append(wrap);card.append(main);attachAuthorBadge(card,topic.user_id);const actions=document.createElement('div');actions.className='listing-actions';const reply=document.createElement('button');reply.className='btn';reply.textContent='Yorumlar';reply.onclick=()=>openTopic(topic);actions.append(reply);if(currentUser&&(currentUser.id===topic.user_id||isAdmin)){const del=document.createElement('button');del.className='btn btn-red';del.textContent='Sil';del.onclick=async()=>{if(!confirm('Konu silinsin mi?'))return;const {error}=await client.from('topics').delete().eq('id',topic.id);if(error)alert(error.message);else{await loadTopics();loadStats();}};actions.append(del);}card.append(actions);target.append(card);}}
-async function openTopicForm(){if(!requireClient())return;if(!currentUser){openAuth(false);return;}const {data:cats,error:catError}=await client.from('categories').select('*').limit(30);if(catError||!cats?.length){alert('Kategori bilgileri alınamadı: '+(catError?.message||'Kategori bulunamadı'));return;}const categoryOptions=cats.map(c=>({id:c.id,name:c.name||c.title||'Kategori'}));openModal('<h2>Yeni Forum Konusu</h2><form id="topicForm"><label>Başlık</label><input name="title" maxlength="150" required><label>Kategori</label><select name="category_id" id="categoryOptions"></select><label>Mesaj</label><textarea name="content" rows="6" required></textarea><button class="btn" type="submit">Konuyu Yayınla</button></form>');const select=el('categoryOptions');for(const c of categoryOptions){const opt=document.createElement('option');opt.value=c.id;opt.textContent=c.name;select.append(opt);}el('topicForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const button=e.target.querySelector('button');button.disabled=true;const {error}=await client.from('topics').insert({user_id:currentUser.id,category_id:f.get('category_id'),title:String(f.get('title')).trim(),content:String(f.get('content')).trim()});if(error){status(error.message);button.disabled=false;return;}closeModal();switchSection('forumSec');await Promise.all([loadTopics(),loadStats()]);};}
-async function openTopic(topic){if(!requireClient())return;openModal('<h2 id="topicTitle"></h2><p id="topicBody" style="white-space:pre-wrap;overflow-wrap:anywhere"></p><h3 style="margin-top:18px">Yorumlar</h3><div id="commentList">Yükleniyor...</div><div id="commentComposer"></div>');el('topicTitle').textContent=topic.title;el('topicBody').textContent=topic.content||'';const {data,error}=await client.from('comments').select('id,content,user_id,created_at').eq('topic_id',topic.id).order('created_at',{ascending:true}).limit(100);const list=el('commentList');list.replaceChildren();if(error)list.textContent='Yorumlar alınamadı: '+error.message;else if(!data?.length)list.textContent='Henüz yorum yok.';else {await loadAuthorTeams(data.map(c=>c.user_id));for(const comment of data){const line=document.createElement('div');line.style.cssText='border-bottom:1px solid #334155;padding:10px 0';const content=document.createElement('p');content.textContent=comment.content;line.append(content);if(TEAM_BADGES[teamCache.get(comment.user_id)])line.prepend(teamCrest(teamCache.get(comment.user_id),true));if(currentUser&&(currentUser.id===comment.user_id||isAdmin)){const del=document.createElement('button');del.className='btn btn-red';del.textContent='Sil';del.onclick=async()=>{const {error}=await client.from('comments').delete().eq('id',comment.id);if(error)status(error.message);else line.remove();};line.append(del);}list.append(line);}}if(currentUser){const form=document.createElement('form');const input=document.createElement('textarea');input.rows=3;input.required=true;input.placeholder='Yorum yaz...';const submit=document.createElement('button');submit.className='btn';submit.textContent='Yorum Gönder';form.append(input,submit);form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;const {error}=await client.from('comments').insert({topic_id:topic.id,user_id:currentUser.id,content:input.value.trim()});if(error){status(error.message);submit.disabled=false;}else openTopic(topic);};el('commentComposer').append(form);}else el('commentComposer').textContent='Yorum yapmak için giriş yapın.';}
 // Takım arması URL'leri Wikimedia Commons üzerinden yüklenir.
 const TEAM_BADGES={
  besiktas:{name:'Beşiktaş',image:'https://commons.wikimedia.org/wiki/Special:FilePath/Besiktas_JK.svg'},
@@ -780,56 +756,116 @@ function koAuthor(id){const p=koProfileCache.get(id)||{};const aside=document.cr
 function koPost(id,content){const post=document.createElement('div');post.className='ko-post';post.append(koAuthor(id));const body=document.createElement('div');body.className='ko-post-message';body.textContent=content||'';post.append(body);return post;}
 async function koCategories(){const {data,error}=await client.from('categories').select('*').limit(100);if(error){console.warn('Kategoriler:',error.message);koCategoryMap=[];return [];}koCategoryMap=data||[];return koCategoryMap;}
 function koCategoryMatch(label){const normalize=x=>String(x||'').toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]/g,'');const a=normalize(label);return koCategoryMap.find(c=>normalize(c.name||c.title)===a)||koCategoryMap.find(c=>normalize(c.name||c.title).includes(a)||a.includes(normalize(c.name||c.title)));}
-
+let koCurrentTopic=null;
 function koSetForumView(view){
-  const sec=document.getElementById('forumSec');
-  if(!sec)return;
-  sec.classList.toggle('ko-category-page',view==='category');
-  sec.classList.toggle('ko-topic-page',view==='topic');
-  const home=document.getElementById('koCategoryHome');
-  const results=document.getElementById('forumResults');
-  const crumb=document.getElementById('forumBreadcrumb');
-  const topic=document.getElementById('koInlineTopic');
-  const tabs=sec.querySelector('.sub-nav-tabs');
-  const hero=sec.querySelector('.hero-banner-portal');
-  const ad=sec.querySelector('.ko-ad-wrap');
-  const onHome=view==='home';
-  [home,tabs,hero,ad].forEach(node=>{if(node)node.style.setProperty('display',onHome?'':'none',onHome?'':'important');});
-  if(results)results.style.setProperty('display',view==='topic'?'none':'block','important');
-  if(crumb)crumb.style.setProperty('display',view==='category'?'flex':'none','important');
-  if(topic){topic.style.setProperty('display',view==='topic'?'block':'none','important');if(view!=='topic')topic.replaceChildren();}
-  window.scrollTo(0,0);
+ const sec=el('forumSec'),home=el('koCategoryHome'),bread=el('forumBreadcrumb'),results=el('forumResults'),topic=el('koTopicPage');
+ sec.classList.toggle('ko-inner-page',view!=='home');sec.classList.toggle('ko-topic-page',view==='topic');
+ home.hidden=view!=='home';results.hidden=view==='topic';topic.hidden=view!=='topic';
+ bread.hidden=view==='home';bread.replaceChildren();
+ if(view!=='home'){
+  const trail=document.createElement('div');trail.style.cssText='display:flex;align-items:center;gap:8px;flex-wrap:wrap';
+  const homeBtn=document.createElement('button');homeBtn.className='btn';homeBtn.textContent='⌂ Forum Ana Sayfa';homeBtn.onclick=koGoHome;trail.append(homeBtn);
+  if(koSelectedCategory){const catBtn=document.createElement('button');catBtn.className='btn';catBtn.textContent='› '+koSelectedCategory.name;catBtn.onclick=()=>koOpenCategoryById(koSelectedCategory.id);trail.append(catBtn);}
+  if(view==='topic'&&koCurrentTopic){const title=document.createElement('strong');title.textContent='› '+koCurrentTopic.title;trail.append(title);}
+  bread.append(trail);
+  if(view==='category'){const add=document.createElement('button');add.className='btn';add.textContent='+ Yeni Konu Aç';add.onclick=openTopicForm;bread.append(add);}
+ }
 }
-function koGoHome(){koSelectedCategory=null;koSetForumView('home');switchSection('forumSec');history.pushState({koView:'home'},'',location.pathname+location.search+'#forum');document.querySelectorAll('.forum-category-row').forEach(r=>r.classList.remove('selected'));loadTopics();}
-async function koOpenCategory(label){switchSection('forumSec');await koCategories();const cat=koCategoryMatch(label);if(!cat){alert('Kategori veritabanında bulunamadı: '+label);return;}koSelectedCategory={id:cat.id,name:cat.name||cat.title};koSetForumView('category');history.pushState({koView:'category',label},'','#kategori-'+encodeURIComponent(label));document.querySelectorAll('.forum-category-row').forEach(r=>r.classList.toggle('selected',r.querySelector('strong')?.textContent===label));await loadTopics();}
+function koGoHome(skipHistory=false){koCurrentTopic=null;koSelectedCategory=null;switchSection('forumSec');if(!skipHistory)history.pushState({ko:'home'},'','#/forum');loadTopics();window.scrollTo(0,0);}
+async function koOpenCategoryById(id,skipHistory=false){
+ switchSection('forumSec');const cats=await koCategories();const cat=cats.find(c=>String(c.id)===String(id));
+ if(!cat){alert('Kategori bulunamadı.');return;}
+ koSelectedCategory={id:cat.id,name:cat.name||cat.title};koCurrentTopic=null;
+ if(!skipHistory)history.pushState({ko:'category',id:String(cat.id)},'','#/category/'+encodeURIComponent(cat.id));
+ await loadTopics();window.scrollTo(0,0);
+}
+async function koOpenCategory(label){
+ const cats=await koCategories();const cat=koCategoryMatch(label);
+ if(!cat){alert('Kategori veritabanında bulunamadı: '+label);return;}
+ await koOpenCategoryById(cat.id);
+}
+async function koRestoreRoute(){
+ const route=decodeURIComponent(location.hash||'');
+ if(route.startsWith('#/category/')){await koOpenCategoryById(route.slice(11),true);return;}
+ if(route.startsWith('#/topic/')){
+  const id=route.slice(8);const {data,error}=await client.from('topics').select('id,title,content,user_id,created_at,category_id').eq('id',id).maybeSingle();
+  if(error||!data){koGoHome(true);return;}
+  const cats=await koCategories();const cat=cats.find(c=>String(c.id)===String(data.category_id));
+  koSelectedCategory=cat?{id:cat.id,name:cat.name||cat.title}:null;
+  await openTopic(data,true);return;
+ }
+ koGoHome(true);
+}
+window.addEventListener('popstate',()=>koRestoreRoute());
+window.addEventListener('hashchange',()=>koRestoreRoute());
 function koInitCategories(){document.querySelectorAll('.forum-category-row').forEach(row=>{const label=row.querySelector('strong')?.textContent?.trim();if(!label)return;row.setAttribute('role','button');row.tabIndex=0;row.onclick=()=>koOpenCategory(label);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();koOpenCategory(label);}};});}
-async function loadTopics(){if(!client)return;const target=el('forumResults');target.textContent='Konular yükleniyor...';const bread=el('forumBreadcrumb');bread.hidden=!koSelectedCategory;bread.replaceChildren();const name=document.createElement('span');name.textContent=koSelectedCategory?'📂 '+koSelectedCategory.name:'Forum / Son Konular';const home=document.createElement('button');home.className='btn';home.textContent='⌂ Ana Sayfa';home.onclick=koGoHome;bread.append(home);const actions=document.createElement('div');actions.className='ko-forum-actions';const all=document.createElement('button');all.className='btn';all.textContent='Tüm Konular';all.onclick=()=>koGoHome();const add=document.createElement('button');add.className='btn';add.textContent='+ Konu Aç';add.onclick=()=>openTopicForm();actions.append(all,add);bread.append(name,actions);
-let q=client.from('topics').select('id,title,content,user_id,created_at,category_id').order('created_at',{ascending:false}).limit(100);if(koSelectedCategory)q=q.eq('category_id',koSelectedCategory.id);const {data,error}=await q;target.replaceChildren();if(error){target.textContent='Konular yüklenemedi: '+error.message;return;}if(!data?.length){target.textContent='Bu bölümde henüz konu yok. İlk konuyu aç!';return;}await Promise.all([koProfiles(data.map(t=>t.user_id)),loadAuthorTeams(data.map(t=>t.user_id))]);for(const t of data){const card=document.createElement('div');card.className='forum-card-box';card.style.cursor='pointer';const left=document.createElement('div');left.className='card-main-info';left.append(koAvatar(koProfileCache.get(t.user_id)?.avatar_url,true));const wrap=document.createElement('div');const title=document.createElement('div');title.className='card-title';title.textContent=t.title;const desc=document.createElement('div');desc.className='card-desc';desc.textContent=String(t.content||'').slice(0,160);const meta=document.createElement('div');meta.className='card-desc';meta.textContent=koDisplayName(t.user_id)+' · '+new Date(t.created_at).toLocaleDateString('tr-TR');wrap.append(title,desc,meta);left.append(wrap);card.append(left);card.onclick=()=>openTopic(t);const b=document.createElement('button');b.className='btn';b.textContent='Konuyu Aç';b.onclick=e=>{e.stopPropagation();openTopic(t);};card.append(b);target.append(card);}}
+async function loadTopics(){
+ if(!client)return;
+ const target=el('forumResults');if(!target)return;
+ const view=koSelectedCategory?'category':'home';
+ koSetForumView(view);
+ target.textContent='Konular yükleniyor...';
+ let q=client.from('topics').select('id,title,content,user_id,created_at,category_id').order('created_at',{ascending:false}).limit(100);
+ if(koSelectedCategory)q=q.eq('category_id',koSelectedCategory.id);
+ const {data,error}=await q;
+ if((koSelectedCategory?'category':'home')!==view)return;
+ target.replaceChildren();
+ if(error){target.textContent='Konular yüklenemedi: '+error.message;return;}
+ if(!data?.length){target.textContent='Bu bölümde henüz konu yok. İlk konuyu aç!';return;}
+ await Promise.all([koProfiles(data.map(t=>t.user_id)),loadAuthorTeams(data.map(t=>t.user_id))]);
+ for(const t of data){
+  const card=document.createElement('div');card.className='forum-card-box';card.style.cursor='pointer';
+  const left=document.createElement('div');left.className='card-main-info';left.append(koAvatar(koProfileCache.get(t.user_id)?.avatar_url,true));
+  const wrap=document.createElement('div');const title=document.createElement('div');title.className='card-title';title.textContent=t.title;
+  const desc=document.createElement('div');desc.className='card-desc';desc.textContent=String(t.content||'').slice(0,160);
+  const meta=document.createElement('div');meta.className='card-desc';meta.textContent=koDisplayName(t.user_id)+' · '+new Date(t.created_at).toLocaleDateString('tr-TR');
+  wrap.append(title,desc,meta);left.append(wrap);card.append(left);
+  card.onclick=()=>openTopic(t);
+  const b=document.createElement('button');b.className='btn';b.textContent='Konuyu Aç';b.onclick=e=>{e.stopPropagation();openTopic(t);};card.append(b);target.append(card);
+ }
+}
 async function openTopicForm(){if(!requireClient())return;if(!currentUser){openAuth(false);return;}const cats=await koCategories();if(!cats.length){alert('Veritabanında kategori bulunamadı. Önce SQL kurulumunu tamamlamalıyız.');return;}openModal('<h2>Yeni Konu Aç</h2><form id="topicForm"><label>Başlık</label><input name="title" maxlength="150" required><label>Kategori</label><select id="koTopicCategory" name="category_id" required></select><label>Mesaj</label><textarea id="koTopicMessage" name="content" rows="7" required></textarea><button class="btn" type="submit">Konuyu Yayınla</button></form>');const sel=el('koTopicCategory');for(const c of cats){const o=document.createElement('option');o.value=c.id;o.textContent=c.name||c.title;sel.append(o);}if(koSelectedCategory)sel.value=koSelectedCategory.id;const textarea=el('koTopicMessage');textarea.before(koEmojiToolbar(textarea));el('topicForm').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('[type=submit]');b.disabled=true;const f=new FormData(e.target);const {error}=await client.from('topics').insert({user_id:currentUser.id,category_id:f.get('category_id'),title:String(f.get('title')).trim(),content:String(f.get('content')).trim()});if(error){status('Konu kaydedilemedi: '+error.message);b.disabled=false;return;}closeModal();switchSection('forumSec');await loadTopics();loadStats();};}
-async function openTopic(topic){if(!requireClient())return;koSetForumView('topic');switchSection('forumSec');history.pushState({koView:'topic',topicId:topic.id},'','#konu-'+encodeURIComponent(topic.id));const topicArea=el('koInlineTopic');topicArea.innerHTML='<nav class="ko-path"><button id="koBackHome">Ana Sayfa</button> › <button id="koBackCategory">Kategoriye Dön</button> › Konu</nav><h2 class="ko-topic-title" id="koTopicTitle"></h2><div id="koTopicPosts">Yükleniyor...</div><h3>Cevap Yaz</h3><div id="koReplyComposer"></div>';el('koBackHome').onclick=koGoHome;el('koBackCategory').onclick=()=>{koSetForumView('category');history.pushState({koView:'category',label:koSelectedCategory?.name||''},'','#kategori-'+encodeURIComponent(koSelectedCategory?.name||''));loadTopics();};window.scrollTo(0,0);el('koTopicTitle').textContent=topic.title;const {data,error}=await client.from('comments').select('id,content,user_id,created_at').eq('topic_id',topic.id).order('created_at',{ascending:true}).limit(100);const ids=[topic.user_id,...(data||[]).map(c=>c.user_id)];await Promise.all([koProfiles(ids),loadAuthorTeams(ids)]);const list=el('koTopicPosts');list.replaceChildren();list.append(koPost(topic.user_id,topic.content));if(error){const p=document.createElement('p');p.textContent='Yorumlar yüklenemedi: '+error.message;list.append(p);}else for(const c of data||[]){const post=koPost(c.user_id,c.content);if(currentUser&&(currentUser.id===c.user_id||isAdmin)){const del=document.createElement('button');del.className='btn btn-red';del.textContent='Yorumu Sil';del.onclick=async()=>{if(!confirm('Yorum silinsin mi?'))return;const {error}=await client.from('comments').delete().eq('id',c.id);if(error)alert(error.message);else post.remove();};post.lastElementChild.append(del);}list.append(post);}const composer=el('koReplyComposer');if(!currentUser){const b=document.createElement('button');b.className='btn';b.textContent='Cevap yazmak için giriş yap';b.onclick=()=>openAuth(false);composer.append(b);return;}const form=document.createElement('form');const input=document.createElement('textarea');input.rows=4;input.required=true;input.placeholder='Cevabını yaz...';input.style.cssText='width:100%;padding:12px;background:#080e12;color:white;border:1px solid #66563c';const submit=document.createElement('button');submit.className='btn';submit.textContent='Cevap Gönder';form.append(koEmojiToolbar(input),input,submit);composer.append(form);form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;const {error}=await client.from('comments').insert({topic_id:topic.id,user_id:currentUser.id,content:input.value.trim()});if(error){alert(error.message);submit.disabled=false;return;}await openTopic(topic);};}
+async function openTopic(topic,skipHistory=false){
+ if(!requireClient())return;
+ switchSection('forumSec');
+ koCurrentTopic=topic;
+ koSetForumView('topic');
+ if(!skipHistory)history.pushState({ko:'topic',id:String(topic.id)},'', '#/topic/'+encodeURIComponent(topic.id));
+ const page=el('koTopicPage');page.replaceChildren();
+ const heading=document.createElement('h2');heading.className='ko-topic-heading';heading.textContent=topic.title;
+ const posts=document.createElement('div');posts.textContent='Mesajlar yükleniyor...';
+ const replyTitle=document.createElement('h3');replyTitle.textContent='Cevap Yaz';replyTitle.style.margin='20px 0 8px';
+ const composer=document.createElement('div');page.append(heading,posts,replyTitle,composer);
+ const {data,error}=await client.from('comments').select('id,content,user_id,created_at').eq('topic_id',topic.id).order('created_at',{ascending:true}).limit(100);
+ if(koCurrentTopic?.id!==topic.id)return;
+ const ids=[topic.user_id,...(data||[]).map(c=>c.user_id)];
+ await Promise.all([koProfiles(ids),loadAuthorTeams(ids)]);
+ posts.replaceChildren();posts.append(koPost(topic.user_id,topic.content));
+ if(error){const p=document.createElement('p');p.textContent='Yorumlar yüklenemedi: '+error.message;posts.append(p);}
+ else for(const c of data||[]){
+  const post=koPost(c.user_id,c.content);
+  if(currentUser&&(currentUser.id===c.user_id||isAdmin)){
+   const del=document.createElement('button');del.className='btn btn-red';del.textContent='Yorumu Sil';
+   del.onclick=async()=>{if(!confirm('Yorum silinsin mi?'))return;const {error}=await client.from('comments').delete().eq('id',c.id);if(error)alert(error.message);else post.remove();};
+   post.lastElementChild.append(del);
+  }posts.append(post);
+ }
+ if(!currentUser){const b=document.createElement('button');b.className='btn';b.textContent='Cevap yazmak için giriş yap';b.onclick=()=>openAuth(false);composer.append(b);return;}
+ const form=document.createElement('form');const input=document.createElement('textarea');input.rows=4;input.required=true;input.placeholder='Cevabını yaz...';
+ const submit=document.createElement('button');submit.className='btn';submit.textContent='Cevap Gönder';
+ form.append(koEmojiToolbar(input),input,submit);composer.append(form);
+ form.onsubmit=async e=>{e.preventDefault();const content=input.value.trim();if(!content)return;submit.disabled=true;
+  const {error}=await client.from('comments').insert({topic_id:topic.id,user_id:currentUser.id,content});
+  if(error){alert(error.message);submit.disabled=false;return;}await openTopic(topic,true);
+ };
+}
 async function openMyProfile(){if(!currentUser){openAuth(false);return;}switchSection('profileSec');await Promise.all([koProfiles([currentUser.id]),loadAuthorTeams([currentUser.id])]);const p=koProfileCache.get(currentUser.id)||{};const area=el('profileContent');area.replaceChildren();const panel=document.createElement('div');panel.className='ko-profile-panel';panel.append(koAuthor(currentUser.id));const form=document.createElement('form');form.innerHTML='<label>Görünen Kullanıcı Adı</label><input id="koDisplayInput" maxlength="32" required><label>Profil Fotoğrafı (JPG, PNG veya WEBP, en fazla 2 MB)</label><input id="koAvatarInput" type="file" accept="image/jpeg,image/png,image/webp"><button type="submit" class="btn">Profili Kaydet</button><p id="koProfileStatus" class="status"></p>';panel.append(form);area.append(panel);el('koDisplayInput').value=p.display_name==='Üye'?(currentUser.user_metadata?.username||''):p.display_name||currentUser.user_metadata?.username||'';form.onsubmit=async e=>{e.preventDefault();const st=el('koProfileStatus');st.textContent='Kaydediliyor...';const name=el('koDisplayInput').value.trim();if(name.length<2){st.textContent='Kullanıcı adı en az 2 karakter olmalı.';return;}let avatar=p.avatar_url||null;const file=el('koAvatarInput').files[0];if(file){if(file.size>2*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type)){st.textContent='Fotoğraf JPG/PNG/WEBP ve 2 MB altında olmalı.';return;}const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';const path=currentUser.id+'/avatar.'+ext;const uploaded=await client.storage.from('forum-avatars').upload(path,file,{upsert:true,contentType:file.type});if(uploaded.error){st.textContent='Fotoğraf yüklenemedi: '+uploaded.error.message;return;}avatar=client.storage.from('forum-avatars').getPublicUrl(path).data.publicUrl+'?v='+Date.now();}const {error}=await client.from('forum_profiles').upsert({user_id:currentUser.id,display_name:name,avatar_url:avatar},{onConflict:'user_id'});if(error){st.textContent='Profil kaydedilemedi: '+error.message;return;}koProfileCache.set(currentUser.id,{...p,user_id:currentUser.id,display_name:name,avatar_url:avatar});st.textContent='Profil kaydedildi.';el('profileName').textContent=name;await openMyProfile();};const {data:mine}=await client.from('topics').select('id,title,content,user_id,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);const heading=document.createElement('h3');heading.style.margin='20px 0 10px';heading.textContent='Açtığım Konular';area.append(heading);if(!mine?.length){const p=document.createElement('p');p.textContent='Henüz konu açmadın.';area.append(p);}else for(const t of mine){const b=document.createElement('button');b.className='btn';b.style.cssText='display:block;margin:8px 0;text-align:left;width:100%';b.textContent=t.title;b.onclick=()=>openTopic(t);area.append(b);}}
 const koOldRefreshAuth=refreshAuth;
 refreshAuth=async function(){await koOldRefreshAuth();const b=el('myProfileButton');if(b)b.hidden=!currentUser;if(currentUser){await koProfiles([currentUser.id]);el('profileName').textContent=koDisplayName(currentUser.id);}};
 koInitCategories();
 
-window.addEventListener('popstate',async()=>{
-  const hash=decodeURIComponent(location.hash||'');
-  if(hash.startsWith('#kategori-')){
-    const label=hash.slice(9);
-    switchSection('forumSec');await koCategories();
-    const cat=koCategoryMatch(label);
-    if(cat){koSelectedCategory={id:cat.id,name:cat.name||cat.title};koSetForumView('category');await loadTopics();}
-  }else if(hash.startsWith('#konu-')){
-    if(!client)return;
-    const id=hash.slice(6);
-    const {data}=await client.from('topics').select('id,title,content,user_id,created_at,category_id').eq('id',id).maybeSingle();
-    if(data){await openTopic(data);history.replaceState({koView:'topic',topicId:id},'','#konu-'+encodeURIComponent(id));}
-  }else{
-    koSelectedCategory=null;koSetForumView('home');switchSection('forumSec');await loadTopics();
-  }
-});
-
 startApp();
+if(location.hash.startsWith('#/category/')||location.hash.startsWith('#/topic/'))setTimeout(()=>koRestoreRoute(),700);
 </script>
 <footer class="ko-footer"><strong>KO ARENA</strong> Â· Bağımsız Knight Online oyuncu topluluğu<br>NTTGame ile resmÃ® bağlantısı bulunmamaktadır. Oyun adları ilgili sahiplerinin markalarıdır.</footer>
 <script>
