@@ -993,29 +993,32 @@
         document.addEventListener('DOMContentLoaded',koTickerRender);
 
         function showForumTab(tab){
-            document.querySelectorAll('[data-forum-tab]').forEach(el=>{const active=el.dataset.forumTab===tab;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));});
-            document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=el.dataset.forumPanel!==tab;el.style.display=el.hidden?'none':'block';});
+            window.koTopicNavigationToken=(window.koTopicNavigationToken||0)+1;
+            document.querySelectorAll('[data-forum-tab]').forEach(el=>{
+                const active=el.dataset.forumTab===tab;
+                el.classList.toggle('active',active);
+                el.setAttribute('aria-selected',String(active));
+            });
+            document.querySelectorAll('[data-forum-panel]').forEach(el=>{
+                const visible=el.dataset.forumPanel===tab;
+                el.hidden=!visible;
+                el.style.display=visible?'block':'none';
+                el.style.pointerEvents=visible?'auto':'none';
+            });
             const detail=document.getElementById('koTopicDetail');
-            if(detail){detail.hidden=true;detail.style.display='none';}
+            if(detail){detail.hidden=true;detail.style.display='none';detail.style.pointerEvents='none';}
         }
         function openKoTopic(title,author,body){
             const detail=document.getElementById('koTopicDetail');
             if(!detail)return;
-            // The modern topic renderer replaces the detail's old placeholder nodes.
-            // Never access removed koTopicTitle/koTopicAuthor/koTopicBody elements.
-            document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=true;el.style.display='none';});
-            detail.hidden=false;detail.style.display='block';
+            document.querySelectorAll('[data-forum-panel]').forEach(el=>{
+                el.hidden=true;el.style.display='none';el.style.pointerEvents='none';
+            });
+            detail.hidden=false;detail.style.display='block';detail.style.pointerEvents='auto';
         }
         function closeKoTopic(){
-            window.koTopicNavigationToken=(window.koTopicNavigationToken||0)+1;
-            const detail=document.getElementById('koTopicDetail');
-            if(detail){detail.hidden=true;detail.style.display='none';}
             const tab=document.querySelector('[data-forum-tab].active');
-            const name=tab?tab.dataset.forumTab:'duyurular';
-            document.querySelectorAll('[data-forum-panel]').forEach(el=>{
-                el.hidden=el.dataset.forumPanel!==name;
-                el.style.display=el.hidden?'none':'block';
-            });
+            showForumTab(tab?.dataset.forumTab||'duyurular');
         }
     </script>
 
@@ -1150,11 +1153,11 @@ if(client){client.auth.onAuthStateChange(()=>setTimeout(renderUser,0));renderUse
 })();
 </script>
 <script>
-// GÃ¶rsel sunucu seÃ§imi. YÃ¶netici tarafÄ±ndan herkese aÃ§Ä±k yÃ¶netim iÃ§in Supabase tablosu sonraki adÄ±mda baÄŸlanacak.
+// GÃƒÂ¶rsel sunucu seÃƒÂ§imi. YÃƒÂ¶netici tarafÃ„Â±ndan herkese aÃƒÂ§Ã„Â±k yÃƒÂ¶netim iÃƒÂ§in Supabase tablosu sonraki adÃ„Â±mda baÃ„Å¸lanacak.
 const koForumServers=['Zero','Agartha'];
 function koPopulateServerForums(){const el=document.getElementById('koServerForumSelect');if(!el)return;for(const name of koForumServers){const opt=document.createElement('option');opt.value=name.toLowerCase();opt.textContent='Server: '+name;el.appendChild(opt);}}
 function koSelectServerForum(value){if(!value)return;showForumTab(value);}
-// Konu aÃ§ma penceresi aÅŸaÄŸÄ±daki Supabase modÃ¼lÃ¼nden aÃ§Ä±lÄ±r.
+// Konu aÃƒÂ§ma penceresi aÃ…Å¸aÃ„Å¸Ã„Â±daki Supabase modÃƒÂ¼lÃƒÂ¼nden aÃƒÂ§Ã„Â±lÃ„Â±r.
 document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 </script>
 
@@ -1180,6 +1183,8 @@ document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 .ko-list-content strong{display:block;overflow-wrap:anywhere}
 .ko-list-content small{line-height:1.5}
 
+#koTopicDetail[hidden]{display:none!important;pointer-events:none!important}
+.forum-tab-panel[hidden]{display:none!important;pointer-events:none!important}
 /* ForumTR-inspired topic layout */
 #koTopicDetail{padding:0;background:#0e171b;border:1px solid #92764a}
 .ko-topic-head{padding:16px 18px;background:#192329;border-bottom:1px solid #79643b}
@@ -1293,11 +1298,12 @@ async function loadTopics(){
    const back=document.createElement('button');back.type='button';back.className='btn';back.textContent='â† Konulara DÃ¶n';back.onclick=closeKoTopic;
    const title=document.createElement('h2');title.textContent=t.title;
    head.append(back,title);detail.appendChild(head);
+   const loading=document.createElement('p');loading.className='ko-topic-loading';loading.textContent='YanÄ±tlar yÃ¼kleniyor...';loading.style.padding='16px';detail.appendChild(loading);
    const addPost=(text,person,when,canDelete,deleteAction,number)=>{
     const post=document.createElement('article');post.className='ko-topic-post';
     const left=document.createElement('aside');left.className='ko-post-profile';
     const username=document.createElement('strong');username.textContent=person.name||'Ãœye';left.appendChild(username);
-    if(person.avatar_url){const avatar=document.createElement('img');avatar.src=person.avatar_url;avatar.alt='Profil fotoÄŸrafÄ±';avatar.onerror=()=>{avatar.remove();};left.appendChild(avatar);}
+    if(person.avatar_url){const avatar=document.createElement('img');avatar.src=person.avatar_url;avatar.alt='Profil fotoÃ„Å¸rafÃ„Â±';avatar.onerror=()=>{avatar.remove();};left.appendChild(avatar);}
     else {const fallback=document.createElement('div');fallback.className='ko-avatar-fallback';fallback.textContent='â™™';left.appendChild(fallback);}
     const rankEl=document.createElement('span');rankEl.className='ko-rank';rankEl.textContent=rankOf(person.exp);left.appendChild(rankEl);
     const stats=document.createElement('div');stats.className='ko-stats';stats.textContent='Toplam EXP: '+(person.exp??0);if(person.created_at)stats.appendChild(document.createTextNode(' Â· KayÄ±t: '+new Date(person.created_at).toLocaleDateString('tr-TR')));left.appendChild(stats);
@@ -1305,8 +1311,8 @@ async function loadTopics(){
     const date=document.createElement('div');date.className='ko-post-date';date.textContent=new Date(when).toLocaleString('tr-TR')+' Â· #'+number;
     const body=document.createElement('div');body.className='ko-post-text';body.textContent=text;
     const actions=document.createElement('div');actions.className='ko-post-actions';
-    const reply=document.createElement('button');reply.type='button';reply.textContent='YanÄ±tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
-    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'YanÄ±tÄ± Sil';del.onclick=deleteAction;actions.appendChild(del);}
+    const reply=document.createElement('button');reply.type='button';reply.textContent='YanÃ„Â±tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
+    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'YanÃ„Â±tÃ„Â± Sil';del.onclick=deleteAction;actions.appendChild(del);}
     right.append(date,body,actions);post.append(left,right);detail.appendChild(post);
    };
    const rankOf=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'GÃ¼mÃ¼ÅŸ':exp>=500?'Bronz':exp>=100?'Ã‡aylak':'Yeni Ãœye';
@@ -1319,21 +1325,22 @@ async function loadTopics(){
    const {data:fps}=await db.from('forum_profiles').select('user_id,display_name,avatar_url').in('user_id',[...new Set(allIds.filter(Boolean))]);
    for(const p of fps||[]){const prev=people.get(p.user_id)||{};people.set(p.user_id,{...prev,name:prev.name||p.display_name,avatar_url:p.avatar_url});}
    if(navigationToken!==window.koTopicNavigationToken)return;
+   loading.remove();
    const authorPerson={...people.get(t.user_id),name:people.get(t.user_id)?.name||name,exp:people.get(t.user_id)?.exp??author.exp};
-   const deleteTopic=async()=>{if(!confirm('Konuyu kalÄ±cÄ± olarak silmek istiyor musun?'))return;const {error}=await db.from('topics').delete().eq('id',t.id);if(error){alert('Silinemedi: '+error.message);return;}closeKoTopic();loadTopics();};
+   const deleteTopic=async()=>{if(!confirm('Konuyu kalÃ„Â±cÃ„Â± olarak silmek istiyor musun?'))return;const {error}=await db.from('topics').delete().eq('id',t.id);if(error){alert('Silinemedi: '+error.message);return;}closeKoTopic();loadTopics();};
    addPost(t.content,authorPerson,t.created_at,!!(currentUser&&(isAdmin||currentUser.id===t.user_id)),deleteTopic,1);
    if(commentError){const err=document.createElement('p');err.textContent='YanÄ±tlar yÃ¼klenemedi: '+commentError.message;detail.appendChild(err);}
    else for(let i=0;i<(comments||[]).length;i++){
     const c=comments[i];const person=people.get(c.user_id)||{name:'Ãœye'};
-    const delComment=async()=>{if(!confirm('YanÄ±tÄ± silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
+    const delComment=async()=>{if(!confirm('YanÃ„Â±tÃ„Â± silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
     addPost(c.content,person,c.created_at,!!(currentUser&&(isAdmin||currentUser.id===c.user_id)),delComment,i+2);
    }
    const replyBox=document.createElement('div');replyBox.className='ko-reply-box';
-   const label=document.createElement('h3');label.textContent='YanÄ±t Yaz';
-   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='MesajÄ±nÄ± buraya yaz...';
+   const label=document.createElement('h3');label.textContent='YanÃ„Â±t Yaz';
+   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='MesajÃ„Â±nÃ„Â± buraya yaz...';
    const send=document.createElement('button');send.type='button';send.className='btn';send.textContent='YanÄ±tÄ± GÃ¶nder';
    const info=document.createElement('p');info.style.marginTop='10px';
-   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='YanÄ±t en az 2 karakter olmalÄ±.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='YanÄ±t gÃ¶nderilemedi: '+error.message;return;}btn.click();};
+   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='YanÃ„Â±t en az 2 karakter olmalÃ„Â±.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='YanÄ±t gÃ¶nderilemedi: '+error.message;return;}btn.click();};
    replyBox.append(label,textarea,send,info);detail.appendChild(replyBox);
   };
   list.appendChild(btn);
