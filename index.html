@@ -994,7 +994,7 @@
 
         function showForumTab(tab){
             document.querySelectorAll('[data-forum-tab]').forEach(el=>{const active=el.dataset.forumTab===tab;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));});
-            document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=el.dataset.forumPanel!==tab;});
+            document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=el.dataset.forumPanel!==tab;el.style.display=el.hidden?'none':'block';});
             closeKoTopic();
         }
         function openKoTopic(title,author,body){
@@ -1003,13 +1003,17 @@
             document.getElementById('koTopicAuthor').textContent='Ba\u015Flatan: '+author;
             document.getElementById('koTopicBody').textContent=body;
             document.querySelectorAll('[data-forum-panel]').forEach(el=>el.hidden=true);
-            detail.hidden=false;
+            detail.hidden=false;detail.style.display='block';
         }
         function closeKoTopic(){
-            const detail=document.getElementById('koTopicDetail');if(detail)detail.hidden=true;
+            const detail=document.getElementById('koTopicDetail');
+            if(detail){detail.hidden=true;detail.style.display='none';}
             const tab=document.querySelector('[data-forum-tab].active');
             const name=tab?tab.dataset.forumTab:'duyurular';
-            document.querySelectorAll('[data-forum-panel]').forEach(el=>el.hidden=el.dataset.forumPanel!==name);
+            document.querySelectorAll('[data-forum-panel]').forEach(el=>{
+                el.hidden=el.dataset.forumPanel!==name;
+                el.style.display=el.hidden?'none':'block';
+            });
         }
     </script>
 
@@ -1165,6 +1169,15 @@ document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 .ko-real-topic{width:100%;text-align:left;display:block;border:0;border-bottom:1px solid #354044;background:transparent;color:#f2e5c9;padding:14px 16px;cursor:pointer}
 .ko-real-topic:hover{background:#29332e}.ko-delete-topic{margin:10px 0;background:#632820;color:#fff;border:1px solid #b65b50;border-radius:3px;padding:9px 12px;cursor:pointer}.ko-delete-topic[hidden]{display:none}.ko-real-topic small{display:block;color:#aeb2ae;margin-top:5px}
 
+
+/* Forum konu listesi: yazar profil fotografi ve baslik */
+.ko-real-topic{display:flex;align-items:center;gap:14px;min-height:75px}
+.ko-list-avatar{width:46px;height:46px;min-width:46px;display:grid;place-items:center;overflow:hidden;border-radius:6px;border:1px solid #a98a52;background:#273239;color:#e7bd67;font-weight:800;font-size:19px}
+.ko-list-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.ko-list-content{display:block;min-width:0;flex:1}
+.ko-list-content strong{display:block;overflow-wrap:anywhere}
+.ko-list-content small{line-height:1.5}
+
 /* ForumTR-inspired topic layout */
 #koTopicDetail{padding:0;background:#0e171b;border:1px solid #92764a}
 .ko-topic-head{padding:16px 18px;background:#192329;border-bottom:1px solid #79643b}
@@ -1248,10 +1261,8 @@ async function loadTopics(){
  if(ids.length){
   const {data:profiles,error:profileError}=await db.from('profiles').select('id,username,exp').in('id',ids);
   if(!profileError)for(const p of profiles||[])authors.set(p.id,{name:p.username,exp:p.exp});
-  const missing=ids.filter(id=>!authors.get(id)?.name);
-  if(missing.length){const {data:forumProfiles,error:forumError}=await db.from('forum_profiles').select('user_id,display_name').in('user_id',missing);
-   if(!forumError)for(const p of forumProfiles||[]){const old=authors.get(p.user_id)||{};authors.set(p.user_id,{...old,name:old.name||p.display_name});}
-  }
+  const {data:forumProfiles,error:forumError}=await db.from('forum_profiles').select('user_id,display_name,avatar_url').in('user_id',ids);
+  if(!forumError)for(const p of forumProfiles||[]){const old=authors.get(p.user_id)||{};authors.set(p.user_id,{...old,name:old.name||p.display_name,avatar_url:p.avatar_url||old.avatar_url});}
  }
  document.querySelectorAll('.ko-dynamic-topics').forEach(el=>el.remove());
  for(const t of topics||[]){
@@ -1265,7 +1276,11 @@ async function loadTopics(){
   const btn=document.createElement('button');btn.type='button';btn.className='ko-real-topic';
   const heading=document.createElement('strong');heading.textContent=t.title;
   const small=document.createElement('small');small.textContent='A\u00e7an: '+name+' \u00b7 '+new Date(t.created_at).toLocaleDateString('tr-TR')+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'');
-  btn.append(heading,small);
+  const avatar=document.createElement('span');avatar.className='ko-list-avatar';
+  if(author.avatar_url){const img=document.createElement('img');img.src=author.avatar_url;img.alt='';img.loading='lazy';img.onerror=()=>{img.remove();avatar.textContent=name.slice(0,1).toLocaleUpperCase('tr-TR');};avatar.appendChild(img);}
+  else avatar.textContent=name.slice(0,1).toLocaleUpperCase('tr-TR');
+  const contentWrap=document.createElement('span');contentWrap.className='ko-list-content';contentWrap.append(heading,small);
+  btn.append(avatar,contentWrap);
   btn.onclick=async()=>{
    openKoTopic(t.title,name,t.content);
    const detail=document.getElementById('koTopicDetail');
