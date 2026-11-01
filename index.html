@@ -567,6 +567,8 @@
                 <div class="sub-nav-tabs" role="tablist" aria-label="Forum kategorileri">
                     <button type="button" class="sub-tab active" data-forum-tab="duyurular" onclick="showForumTab('duyurular')">Duyuru</button>
                     <button type="button" class="sub-tab" data-forum-tab="cz" onclick="showForumTab('cz')">Knight Online Genel</button>
+                    <button type="button" class="sub-tab" data-forum-tab="clan" onclick="showForumTab('clan')">Clan Tan&#305;t&#305;m&#305;</button>
+                    <button type="button" class="sub-tab" data-forum-tab="destek" onclick="showForumTab('destek')">&#350;ikayet ve Destek</button>
                     <div class="ko-forum-actions"><button type="button" class="btn ko-new-topic-btn" onclick="koOpenNewTopic()"><i class="fa-solid fa-pen-nib"></i> YEN&#304; KONU A&#199;</button><select id="koServerForumSelect" class="filter-select" aria-label="Sunucu forumu se&#231;" onchange="koSelectServerForum(this.value)"><option value="">Sunucu Se&#231;</option></select></div>
                 </div>
                 <div class="forum-tab-panel" data-forum-panel="duyurular">
@@ -578,6 +580,8 @@
                     </div>
                 </div>
                 <div class="forum-tab-panel" data-forum-panel="cz" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-comments"></i> Knight Online Genel</div><div class="ko-forum-empty">Genel tart&#305;&#351;malar burada yer alacak. Konu olu&#351;turma veritaban&#305; ba&#287;lant&#305;s&#305; sonraki ad&#305;mda tamamlanacak.</div></div></div>
+                <div class="forum-tab-panel" data-forum-panel="clan" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-users"></i> Clan Tan&#305;t&#305;m&#305;</div><div class="ko-forum-empty">Clan&#305;n&#305; tan&#305;tmak i&#231;in Yeni Konu A&#231; butonunu kullan.</div></div></div>
+                <div class="forum-tab-panel" data-forum-panel="destek" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-headset"></i> &#350;ikayet ve Destek</div><div class="ko-forum-empty">&#350;ikayet ve destek taleplerini bu kategoride payla&#351;.</div></div></div>
                 <div class="forum-tab-panel" data-forum-panel="zero" hidden>
                     <div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-server"></i> Zero Sunucu Forumu</div><div class="ko-forum-empty">Zero sunucusu i&#231;in hen&#252;z konu a&#231;&#305;lmad&#305;. &#220;yelik ve forum veritaban&#305; ba&#287;land&#305;&#287;&#305;nda burada oyuncu konular&#305; g&#246;sterilecek.</div></div>
                 </div>
@@ -1159,7 +1163,7 @@ document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 #koTopicModal .ko-topic-buttons{display:flex;gap:9px;margin-top:16px}
 #koTopicStatus{font-size:12px;color:#f1c97b;margin-top:12px;line-height:1.5}
 .ko-real-topic{width:100%;text-align:left;display:block;border:0;border-bottom:1px solid #354044;background:transparent;color:#f2e5c9;padding:14px 16px;cursor:pointer}
-.ko-real-topic:hover{background:#29332e}.ko-real-topic small{display:block;color:#aeb2ae;margin-top:5px}
+.ko-real-topic:hover{background:#29332e}.ko-delete-topic{margin:10px 0;background:#632820;color:#fff;border:1px solid #b65b50;border-radius:3px;padding:9px 12px;cursor:pointer}.ko-delete-topic[hidden]{display:none}.ko-real-topic small{display:block;color:#aeb2ae;margin-top:5px}
 </style>
 <div id="koTopicModal" role="presentation"><div class="ko-topic-form-box" role="dialog" aria-modal="true" aria-label="Yeni konu olu&#351;tur">
 <h2>Yeni Konu A&#231;</h2>
@@ -1175,7 +1179,7 @@ const modal=document.getElementById('koTopicModal'),form=document.getElementById
 const client=()=>window.koSupabase;
 let categories=[];
 function categoryName(c){return String(c.name??c.title??c.ad??c.category_name??('Kategori '+c.id));}
-function tabFor(name){const n=name.toLocaleLowerCase('tr-TR');if(n.includes('duyuru'))return 'duyurular';if(n.includes('genel')||n.includes('knight online'))return 'cz';if(n.includes('zero'))return 'zero';if(n.includes('agartha'))return 'agartha';return null;}
+function tabFor(name){const n=name.toLocaleLowerCase('tr-TR');if(n.includes('clan')||n.includes('klan'))return 'clan';if(n.includes('ÅŸikayet')||n.includes('sikayet')||n.includes('destek'))return 'destek';if(n.includes('duyuru'))return 'duyurular';if(n.includes('genel')||n.includes('knight online'))return 'cz';if(n.includes('zero'))return 'zero';if(n.includes('agartha'))return 'agartha';return null;}
 async function loadCategories(){
  const db=client();if(!db)throw Error('Veritaban\u0131 ba\u011flant\u0131s\u0131 kurulamad\u0131.');
  const {data,error}=await db.from('categories').select('*').order('id',{ascending:true});if(error)throw error;
@@ -1211,6 +1215,12 @@ async function loadTopics(){
  const db=client();if(!db)return;
  const {data:cats,error:catError}=await db.from('categories').select('*');if(catError)return;
  const {data:topics,error}=await db.from('topics').select('id,category_id,title,content,created_at,user_id').order('created_at',{ascending:false}).limit(100);if(error)return;
+ const {data:{user:currentUser}}=await db.auth.getUser();
+ let isAdmin=false;
+ if(currentUser){
+  const {data:adminByUser,error:adminErr}=await db.from('admins').select('*').eq('user_id',currentUser.id).limit(1);
+  if(!adminErr&&adminByUser?.length)isAdmin=true;
+ }
  const ids=[...new Set((topics||[]).map(t=>t.user_id).filter(Boolean))];
  const authors=new Map();
  if(ids.length){
@@ -1234,7 +1244,7 @@ async function loadTopics(){
   const heading=document.createElement('strong');heading.textContent=t.title;
   const small=document.createElement('small');small.textContent='A\u00e7an: '+name+' \u00b7 '+new Date(t.created_at).toLocaleDateString('tr-TR')+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'');
   btn.append(heading,small);
-  btn.onclick=()=>{openKoTopic(t.title,name,t.content);document.getElementById('koTopicAuthor').textContent='Konuyu a\u00e7an: '+name+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'')+' \u00b7 '+new Date(t.created_at).toLocaleString('tr-TR');};
+  btn.onclick=()=>{openKoTopic(t.title,name,t.content);const detail=document.getElementById('koTopicDetail');let del=detail.querySelector('.ko-delete-topic');if(!del){del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent='Konuyu Sil';detail.appendChild(del);}del.hidden=!(currentUser&&(isAdmin||currentUser.id===t.user_id));del.onclick=async()=>{if(!confirm('Bu konuyu kalÄ±cÄ± olarak silmek istiyor musun?'))return;del.disabled=true;const {error:deleteError}=await db.from('topics').delete().eq('id',t.id);del.disabled=false;if(deleteError){alert('Silme izni veya baÄŸlantÄ± hatasÄ±: '+deleteError.message);return;}detail.hidden=true;document.querySelectorAll('.forum-tab-panel').forEach(el=>el.hidden=false);if(typeof showForumTab==='function')showForumTab(tab);loadTopics();};document.getElementById('koTopicAuthor').textContent='Konuyu a\u00e7an: '+name+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'')+' \u00b7 '+new Date(t.created_at).toLocaleString('tr-TR');};
   list.appendChild(btn);
  }
 }
