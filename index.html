@@ -579,7 +579,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="forum-tab-panel" data-forum-panel="cz" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-comments"></i> Knight Online Genel</div><div class="ko-forum-empty">Genel tart&#305;&#351;malar burada yer alacak. Konu olu&#351;turma veritaban&#305; ba&#287;lant&#305;s&#305; sonraki ad&#305;mda tamamlanacak.</div></div></div>
+                <div class="forum-tab-panel" data-forum-panel="cz" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-comments"></i> Knight Online Genel</div><div class="ko-forum-empty">Bu kategorideki konular a&#351;a&#287;&#305;da listelenir.</div></div></div>
                 <div class="forum-tab-panel" data-forum-panel="clan" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-users"></i> Clan Tan&#305;t&#305;m&#305;</div><div class="ko-forum-empty">Clan&#305;n&#305; tan&#305;tmak i&#231;in Yeni Konu A&#231; butonunu kullan.</div></div></div>
                 <div class="forum-tab-panel" data-forum-panel="destek" hidden><div class="forum-category-list"><div class="forum-category-heading"><i class="fa-solid fa-headset"></i> &#350;ikayet ve Destek</div><div class="ko-forum-empty">&#350;ikayet ve destek taleplerini bu kategoride payla&#351;.</div></div></div>
                 <div class="forum-tab-panel" data-forum-panel="zero" hidden>
@@ -1000,9 +1000,9 @@
         }
         function openKoTopic(title,author,body){
             const detail=document.getElementById('koTopicDetail');
-            document.getElementById('koTopicTitle').textContent=title;
-            document.getElementById('koTopicAuthor').textContent='Ba\u015Flatan: '+author;
-            document.getElementById('koTopicBody').textContent=body;
+            if(!detail)return;
+            // The modern topic renderer replaces the detail's old placeholder nodes.
+            // Never access removed koTopicTitle/koTopicAuthor/koTopicBody elements.
             document.querySelectorAll('[data-forum-panel]').forEach(el=>{el.hidden=true;el.style.display='none';});
             detail.hidden=false;detail.style.display='block';
         }
