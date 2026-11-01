@@ -612,13 +612,13 @@
                     </select>
                 </div>
 
-                <div class="panel-box" style="margin-bottom:16px"><div class="panel-header"><i class="fa-solid fa-circle-plus"></i> Yeni Pazar Ä°lanÄ± AÃ§</div>
+                <div class="panel-box" style="margin-bottom:16px"><div class="panel-header"><i class="fa-solid fa-circle-plus"></i> Yeni Pazar &#304;lan&#305; A&#231;</div>
                   <div class="panel-body"><form id="koMarketForm" style="display:grid;gap:10px">
-                    <input id="koMarketTitle" required maxlength="120" placeholder="Ä°lan baÅŸlÄ±ÄŸÄ± (Ã¶r. Pandora +8 Shard)" class="wheel-input">
-                    <div class="filter-grid" style="margin:0"><select id="koMarketServer" class="filter-select" required><option value="">Sunucu seÃ§</option><option value="zero">Zero</option><option value="agartha">Agartha</option><option value="pandora">Pandora</option><option value="other">DiÄŸer sunucu</option></select><select id="koMarketType" class="filter-select" required><option value="item">Ä°tem / GB</option><option value="char">Karakter / Ring</option></select></div>
+                    <input id="koMarketTitle" required maxlength="120" placeholder="&#304;lan ba&#351;l&#305;&#287;&#305; (&#246;r. Pandora +8 Shard)" class="wheel-input">
+                    <div class="filter-grid" style="margin:0"><select id="koMarketServer" class="filter-select" required><option value="">Sunucu se&#231;</option><option value="zero">Zero</option><option value="agartha">Agartha</option><option value="pandora">Pandora</option><option value="other">Di&#287;er sunucu</option></select><select id="koMarketType" class="filter-select" required><option value="item">&#304;tem / GB</option><option value="char">Karakter / Ring</option></select></div>
                     <input id="koMarketPrice" class="wheel-input" type="number" min="0" step="0.01" placeholder="Fiyat (TL)" required>
-                    <textarea id="koMarketDescription" class="wheel-input" rows="4" required maxlength="2000" placeholder="Ä°lan aÃ§Ä±klamasÄ± ve oyun iÃ§i iletiÅŸim bilgisi"></textarea>
-                    <button class="btn" type="submit">Ä°lanÄ± YayÄ±nla</button><p id="koMarketStatus" role="status" style="color:#f2d391"></p>
+                    <textarea id="koMarketDescription" class="wheel-input" rows="4" required maxlength="2000" placeholder="&#304;lan a&#231;&#305;klamas&#305; ve oyun i&#231;i ileti&#351;im bilgisi"></textarea>
+                    <button class="btn" type="submit">&#304;lan&#305; Yay&#305;nla</button><p id="koMarketStatus" role="status" style="color:#f2d391"></p>
                   </form></div></div>
                 <p id="koMarketLoadStatus" role="status" style="padding:5px 0 12px;color:#c5b99d"></p>
                 <div id="pazarListesi"></div>
@@ -1039,7 +1039,7 @@
 <div id="koProfileOverlay"><div id="koProfileDialog" role="dialog" aria-modal="true" aria-label="Profil ayarlar&#305;">
 <h2>Profilim</h2><p id="koProfileInfo" style="color:#d4c4a3;font-size:12px;line-height:1.7"></p>
 <form id="koProfileForm"><label for="koProfileName">Kullan&#305;c&#305; ad&#305;</label><input id="koProfileName" minlength="3" maxlength="30" required autocomplete="nickname">
-<label for="koProfileAvatar">Profil foto&#287;raf&#305; y&#252;kle (iste&#287;e ba&#287;l&#305;)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">Bilgisayar&#305;ndan JPG, PNG veya WebP se&#231;. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil fotoÄŸrafÄ± Ã¶nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
+<label for="koProfileAvatar">Profil foto&#287;raf&#305; y&#252;kle (iste&#287;e ba&#287;l&#305;)</label><input id="koProfileAvatar" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="koAvatarHelp"><p id="koAvatarHelp" style="color:#b6aa90;font-size:11px;margin-top:5px">Bilgisayar&#305;ndan JPG, PNG veya WebP se&#231;. En fazla 2 MB.</p><img id="koAvatarPreview" alt="Profil foto&#287;raf&#305; &#246;nizlemesi" style="display:none;width:74px;height:74px;object-fit:cover;border-radius:50%;border:2px solid #b99b5a;margin-top:10px">
 <div class="ko-actions"><button type="submit" class="btn">Profili Kaydet</button><button type="button" class="btn" id="koProfileClose">Kapat</button></div></form>
 <form id="koPasswordForm" style="margin-top:20px;padding-top:15px;border-top:1px solid #66563c"><h3 style="color:#f4d995;font-size:14px">&#350;ifre De&#287;i&#351;tir</h3>
 <label for="koNewPassword">Yeni &#351;ifre (en az 6 karakter)</label><input id="koNewPassword" type="password" minlength="6" required autocomplete="new-password">
@@ -1057,18 +1057,18 @@ const message=document.getElementById('koAuthMessage');
 let signup=false;
 const client=window.supabase?.createClient(url,key);
 window.koSupabase=client;
-// Pazar ilanlarÄ± Supabase Ã¼zerinde saklanÄ±r; giriÅŸ yapmadan ilan eklenemez.
+// Pazar ilanlar\u0131 Supabase \u00fczerinde saklan\u0131r; giri\u015f yapmadan ilan eklenemez.
 const marketForm=document.getElementById('koMarketForm');
 const marketStatus=document.getElementById('koMarketStatus');
 const marketList=document.getElementById('pazarListesi');
 const marketLoadStatus=document.getElementById('koMarketLoadStatus');
 async function koLoadMarket(){
  if(!client)return;
- marketLoadStatus.textContent='Ä°lanlar yÃ¼kleniyor...';
+ marketLoadStatus.textContent='\u0130lanlar y\u00fckleniyor...';
  const {data,error}=await client.from('ko_market_ads').select('id,user_id,title,description,server,item_type,price,created_at').order('created_at',{ascending:false}).limit(100);
  marketList.replaceChildren();
- if(error){marketLoadStatus.textContent='Ä°lanlar yÃ¼klenemedi. Ã–nce verilen pazar SQL kurulumunu Ã§alÄ±ÅŸtÄ±r: '+error.message;return;}
- marketLoadStatus.textContent=data.length?'':'HenÃ¼z ilan yok. Ä°lk ilanÄ± sen aÃ§abilirsin.';
+ if(error){marketLoadStatus.textContent='\u0130lanlar y\u00fcklenemedi. \u00d6nce verilen pazar SQL kurulumunu \u00e7al\u0131\u015ft\u0131r: '+error.message;return;}
+ marketLoadStatus.textContent=data.length?'':'Hen\u00fcz ilan yok. \u0130lk ilan\u0131 sen a\u00e7abilirsin.';
  let user=null;try{({data:{user}}=await client.auth.getUser());}catch(e){}
  for(const ad of data){
   const card=document.createElement('div');card.className='forum-card-box pazar-item';card.dataset.server=ad.server;card.dataset.type=ad.item_type;
@@ -1076,22 +1076,22 @@ async function koLoadMarket(){
   const icon=document.createElement('i');icon.className='fa-solid fa-tags card-icon';
   const content=document.createElement('div');const title=document.createElement('div');title.className='card-title';title.textContent=ad.title;
   const desc=document.createElement('div');desc.className='card-desc';desc.style.whiteSpace='pre-wrap';desc.textContent=ad.description;
-  const price=document.createElement('div');price.style.color='#f2d391';price.style.marginTop='6px';price.textContent=Number(ad.price).toLocaleString('tr-TR')+' TL Â· '+ad.server.toUpperCase();
+  const price=document.createElement('div');price.style.color='#f2d391';price.style.marginTop='6px';price.textContent=Number(ad.price).toLocaleString('tr-TR')+' TL \u00b7 '+ad.server.toUpperCase();
   content.append(title,desc,price);main.append(icon,content);card.append(main);
-  if(user&&user.id===ad.user_id){const del=document.createElement('button');del.type='button';del.className='btn btn-red';del.textContent='Ä°lanÄ± Sil';del.onclick=async()=>{if(!confirm('Ä°lanÄ± silmek istiyor musun?'))return;const {error}=await client.from('ko_market_ads').delete().eq('id',ad.id);if(error)alert('Ä°lan silinemedi: '+error.message);else koLoadMarket();};card.append(del);}
+  if(user&&user.id===ad.user_id){const del=document.createElement('button');del.type='button';del.className='btn btn-red';del.textContent='\u0130lan\u0131 Sil';del.onclick=async()=>{if(!confirm('\u0130lan\u0131 silmek istiyor musun?'))return;const {error}=await client.from('ko_market_ads').delete().eq('id',ad.id);if(error)alert('\u0130lan silinemedi: '+error.message);else koLoadMarket();};card.append(del);}
   marketList.append(card);
  }
  filterPazar();
 }
 marketForm.addEventListener('submit',async e=>{
- e.preventDefault();if(!client){marketStatus.textContent='VeritabanÄ± baÄŸlantÄ±sÄ± yok.';return;}
+ e.preventDefault();if(!client){marketStatus.textContent='Veritaban\u0131 ba\u011flant\u0131s\u0131 yok.';return;}
  const {data:{user},error:authError}=await client.auth.getUser();
- if(authError||!user){marketStatus.textContent='Ä°lan aÃ§mak iÃ§in Ã¶nce giriÅŸ yap.';window.koOpenAuth?.(false);return;}
- const submit=marketForm.querySelector('[type=submit]');submit.disabled=true;marketStatus.textContent='Ä°lan kaydediliyor...';
+ if(authError||!user){marketStatus.textContent='\u0130lan a\u00e7mak i\u00e7in \u00f6nce giri\u015f yap.';window.koOpenAuth?.(false);return;}
+ const submit=marketForm.querySelector('[type=submit]');submit.disabled=true;marketStatus.textContent='\u0130lan kaydediliyor...';
  const payload={user_id:user.id,title:document.getElementById('koMarketTitle').value.trim(),server:document.getElementById('koMarketServer').value,item_type:document.getElementById('koMarketType').value,price:Number(document.getElementById('koMarketPrice').value),description:document.getElementById('koMarketDescription').value.trim()};
  const {error}=await client.from('ko_market_ads').insert(payload);
- submit.disabled=false;if(error){marketStatus.textContent='Ä°lan kaydedilemedi: '+error.message;return;}
- marketForm.reset();marketStatus.textContent='Ä°lanÄ±n yayÄ±nlandÄ±.';await koLoadMarket();
+ submit.disabled=false;if(error){marketStatus.textContent='\u0130lan kaydedilemedi: '+error.message;return;}
+ marketForm.reset();marketStatus.textContent='\u0130lan\u0131n yay\u0131nland\u0131.';await koLoadMarket();
 });
 koLoadMarket();
 
@@ -1105,7 +1105,7 @@ const profileName=document.getElementById('koProfileName');
 const profileAvatar=document.getElementById('koProfileAvatar');
 const avatarPreview=document.getElementById('koAvatarPreview');
 let savedAvatarUrl='';
-profileAvatar.addEventListener('change',()=>{const file=profileAvatar.files?.[0];if(!file){avatarPreview.style.display='none';return;}if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>2*1024*1024){profileMessage.textContent='YalnÄ±zca JPG, PNG veya WebP (en fazla 2 MB) seÃ§ebilirsin.';profileAvatar.value='';return;}avatarPreview.src=URL.createObjectURL(file);avatarPreview.style.display='block';});
+profileAvatar.addEventListener('change',()=>{const file=profileAvatar.files?.[0];if(!file){avatarPreview.style.display='none';return;}if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>2*1024*1024){profileMessage.textContent='Yaln\u0131zca JPG, PNG veya WebP (en fazla 2 MB) se\u00e7ebilirsin.';profileAvatar.value='';return;}avatarPreview.src=URL.createObjectURL(file);avatarPreview.style.display='block';});
 let profileExp=null;
 const rankFor=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'G\u00fcm\u00fc\u015f':exp>=500?'Bronz':exp>=100?'\u00c7aylak':'Yeni \u00dcye';
 async function openProfile(focusPassword=false){
@@ -1131,12 +1131,12 @@ document.getElementById('koProfileForm').onsubmit=async e=>{
  const button=e.submitter;if(button)button.disabled=true;profileMessage.textContent='Kaydediliyor...';
  try{
   if(avatarFile){
-   if(!['image/png','image/jpeg','image/webp'].includes(avatarFile.type)||avatarFile.size>2*1024*1024)throw Error('FotoÄŸraf JPG, PNG veya WebP olmalÄ± ve 2 MB sÄ±nÄ±rÄ±nÄ± aÅŸmamalÄ±.');
-   profileMessage.textContent='FotoÄŸraf yÃ¼kleniyor...';
+   if(!['image/png','image/jpeg','image/webp'].includes(avatarFile.type)||avatarFile.size>2*1024*1024)throw Error('Foto\u011fraf JPG, PNG veya WebP olmal\u0131 ve 2 MB s\u0131n\u0131r\u0131n\u0131 a\u015fmamal\u0131.');
+   profileMessage.textContent='Foto\u011fraf y\u00fckleniyor...';
    const ext=avatarFile.type==='image/png'?'png':avatarFile.type==='image/webp'?'webp':'jpg';
    const path=user.id+'/'+crypto.randomUUID()+'.'+ext;
    const {error:uploadError}=await client.storage.from('avatars').upload(path,avatarFile,{contentType:avatarFile.type,upsert:false});
-   if(uploadError)throw Error('FotoÄŸraf yÃ¼klenemedi: '+uploadError.message+' (Supabase avatars deposunu kontrol et.)');
+   if(uploadError)throw Error('Foto\u011fraf y\u00fcklenemedi: '+uploadError.message+' (Supabase avatars deposunu kontrol et.)');
    avatar_url=client.storage.from('avatars').getPublicUrl(path).data.publicUrl;
   }
   const {error:authError}=await client.auth.updateUser({data:{username,avatar_url}});if(authError)throw authError;
@@ -1178,11 +1178,11 @@ if(client){client.auth.onAuthStateChange(()=>setTimeout(renderUser,0));renderUse
 })();
 </script>
 <script>
-// GÃ¶rsel sunucu seÃ§imi. YÃ¶netici tarafÄ±ndan herkese aÃ§Ä±k yÃ¶netim iÃ§in Supabase tablosu sonraki adÄ±mda baÄŸlanacak.
+// G\u00f6rsel sunucu se\u00e7imi. Y\u00f6netici taraf\u0131ndan herkese a\u00e7\u0131k y\u00f6netim i\u00e7in Supabase tablosu sonraki ad\u0131mda ba\u011flanacak.
 const koForumServers=['Zero','Agartha'];
 function koPopulateServerForums(){const el=document.getElementById('koServerForumSelect');if(!el)return;for(const name of koForumServers){const opt=document.createElement('option');opt.value=name.toLowerCase();opt.textContent='Server: '+name;el.appendChild(opt);}}
 function koSelectServerForum(value){if(!value)return;showForumTab(value);}
-// Konu aÃ§ma penceresi aÅŸaÄŸÄ±daki Supabase modÃ¼lÃ¼nden aÃ§Ä±lÄ±r.
+// Konu a\u00e7ma penceresi a\u015fa\u011f\u0131daki Supabase mod\u00fcl\u00fcnden a\u00e7\u0131l\u0131r.
 document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 </script>
 
@@ -1247,7 +1247,7 @@ const modal=document.getElementById('koTopicModal'),form=document.getElementById
 const client=()=>window.koSupabase;
 let categories=[];
 function categoryName(c){return String(c.name??c.title??c.ad??c.category_name??('Kategori '+c.id));}
-function tabFor(name){const n=name.toLocaleLowerCase('tr-TR');if(n.includes('clan')||n.includes('klan'))return 'clan';if(n.includes('ÅŸikayet')||n.includes('sikayet')||n.includes('destek'))return 'destek';if(n.includes('duyuru'))return 'duyurular';if(n.includes('genel')||n.includes('knight online'))return 'cz';if(n.includes('zero'))return 'zero';if(n.includes('agartha'))return 'agartha';return null;}
+function tabFor(name){const n=name.toLocaleLowerCase('tr-TR');if(n.includes('clan')||n.includes('klan'))return 'clan';if(n.includes('\u015fikayet')||n.includes('sikayet')||n.includes('destek'))return 'destek';if(n.includes('duyuru'))return 'duyurular';if(n.includes('genel')||n.includes('knight online'))return 'cz';if(n.includes('zero'))return 'zero';if(n.includes('agartha'))return 'agartha';return null;}
 async function loadCategories(){
  const db=client();if(!db)throw Error('Veritaban\u0131 ba\u011flant\u0131s\u0131 kurulamad\u0131.');
  const {data,error}=await db.from('categories').select('*').order('id',{ascending:true});if(error)throw error;
@@ -1320,27 +1320,27 @@ async function loadTopics(){
    const detail=document.getElementById('koTopicDetail');
    detail.replaceChildren();
    const head=document.createElement('div');head.className='ko-topic-head';
-   const back=document.createElement('button');back.type='button';back.className='btn';back.textContent='â† Konulara DÃ¶n';back.onclick=closeKoTopic;
+   const back=document.createElement('button');back.type='button';back.className='btn';back.textContent='\u2190 Konulara D\u00f6n';back.onclick=closeKoTopic;
    const title=document.createElement('h2');title.textContent=t.title;
    head.append(back,title);detail.appendChild(head);
-   const loading=document.createElement('p');loading.className='ko-topic-loading';loading.textContent='YanÄ±tlar yÃ¼kleniyor...';loading.style.padding='16px';detail.appendChild(loading);
+   const loading=document.createElement('p');loading.className='ko-topic-loading';loading.textContent='Yan\u0131tlar y\u00fckleniyor...';loading.style.padding='16px';detail.appendChild(loading);
    const addPost=(text,person,when,canDelete,deleteAction,number)=>{
     const post=document.createElement('article');post.className='ko-topic-post';
     const left=document.createElement('aside');left.className='ko-post-profile';
-    const username=document.createElement('strong');username.textContent=person.name||'Ãœye';left.appendChild(username);
-    if(person.avatar_url){const avatar=document.createElement('img');avatar.src=person.avatar_url;avatar.alt='Profil fotoÄŸrafÄ±';avatar.onerror=()=>{avatar.remove();};left.appendChild(avatar);}
-    else {const fallback=document.createElement('div');fallback.className='ko-avatar-fallback';fallback.textContent='â™™';left.appendChild(fallback);}
+    const username=document.createElement('strong');username.textContent=person.name||'\u00dcye';left.appendChild(username);
+    if(person.avatar_url){const avatar=document.createElement('img');avatar.src=person.avatar_url;avatar.alt='Profil foto\u011fraf\u0131';avatar.onerror=()=>{avatar.remove();};left.appendChild(avatar);}
+    else {const fallback=document.createElement('div');fallback.className='ko-avatar-fallback';fallback.textContent='\u2659';left.appendChild(fallback);}
     const rankEl=document.createElement('span');rankEl.className='ko-rank';rankEl.textContent=rankOf(person.exp);left.appendChild(rankEl);
-    const stats=document.createElement('div');stats.className='ko-stats';stats.textContent='Toplam EXP: '+(person.exp??0);if(person.created_at)stats.appendChild(document.createTextNode(' Â· KayÄ±t: '+new Date(person.created_at).toLocaleDateString('tr-TR')));left.appendChild(stats);
+    const stats=document.createElement('div');stats.className='ko-stats';stats.textContent='Toplam EXP: '+(person.exp??0);if(person.created_at)stats.appendChild(document.createTextNode(' \u00b7 Kay\u0131t: '+new Date(person.created_at).toLocaleDateString('tr-TR')));left.appendChild(stats);
     const right=document.createElement('div');right.className='ko-post-message';
-    const date=document.createElement('div');date.className='ko-post-date';date.textContent=new Date(when).toLocaleString('tr-TR')+' Â· #'+number;
+    const date=document.createElement('div');date.className='ko-post-date';date.textContent=new Date(when).toLocaleString('tr-TR')+' \u00b7 #'+number;
     const body=document.createElement('div');body.className='ko-post-text';body.textContent=text;
     const actions=document.createElement('div');actions.className='ko-post-actions';
-    const reply=document.createElement('button');reply.type='button';reply.textContent='YanÄ±tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
-    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'YanÄ±tÄ± Sil';del.onclick=deleteAction;actions.appendChild(del);}
+    const reply=document.createElement('button');reply.type='button';reply.textContent='Yan\u0131tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
+    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'Yan\u0131t\u0131 Sil';del.onclick=deleteAction;actions.appendChild(del);}
     right.append(date,body,actions);post.append(left,right);detail.appendChild(post);
    };
-   const rankOf=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'GÃ¼mÃ¼ÅŸ':exp>=500?'Bronz':exp>=100?'Ã‡aylak':'Yeni Ãœye';
+   const rankOf=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'G\u00fcm\u00fc\u015f':exp>=500?'Bronz':exp>=100?'\u00c7aylak':'Yeni \u00dcye';
    const allIds=[t.user_id];
    const {data:comments,error:commentError}=await db.from('comments').select('id,topic_id,user_id,content,created_at').eq('topic_id',t.id).order('created_at',{ascending:true});
    if(!commentError)allIds.push(...(comments||[]).map(c=>c.user_id));
@@ -1352,20 +1352,20 @@ async function loadTopics(){
    if(navigationToken!==window.koTopicNavigationToken)return;
    loading.remove();
    const authorPerson={...people.get(t.user_id),name:people.get(t.user_id)?.name||name,exp:people.get(t.user_id)?.exp??author.exp};
-   const deleteTopic=async()=>{if(!confirm('Konuyu kalÄ±cÄ± olarak silmek istiyor musun?'))return;const {error}=await db.from('topics').delete().eq('id',t.id);if(error){alert('Silinemedi: '+error.message);return;}closeKoTopic();loadTopics();};
+   const deleteTopic=async()=>{if(!confirm('Konuyu kal\u0131c\u0131 olarak silmek istiyor musun?'))return;const {error}=await db.from('topics').delete().eq('id',t.id);if(error){alert('Silinemedi: '+error.message);return;}closeKoTopic();loadTopics();};
    addPost(t.content,authorPerson,t.created_at,!!(currentUser&&(isAdmin||currentUser.id===t.user_id)),deleteTopic,1);
-   if(commentError){const err=document.createElement('p');err.textContent='YanÄ±tlar yÃ¼klenemedi: '+commentError.message;detail.appendChild(err);}
+   if(commentError){const err=document.createElement('p');err.textContent='Yan\u0131tlar y\u00fcklenemedi: '+commentError.message;detail.appendChild(err);}
    else for(let i=0;i<(comments||[]).length;i++){
-    const c=comments[i];const person=people.get(c.user_id)||{name:'Ãœye'};
-    const delComment=async()=>{if(!confirm('YanÄ±tÄ± silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
+    const c=comments[i];const person=people.get(c.user_id)||{name:'\u00dcye'};
+    const delComment=async()=>{if(!confirm('Yan\u0131t\u0131 silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
     addPost(c.content,person,c.created_at,!!(currentUser&&(isAdmin||currentUser.id===c.user_id)),delComment,i+2);
    }
    const replyBox=document.createElement('div');replyBox.className='ko-reply-box';
-   const label=document.createElement('h3');label.textContent='YanÄ±t Yaz';
-   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='MesajÄ±nÄ± buraya yaz...';
-   const send=document.createElement('button');send.type='button';send.className='btn';send.textContent='YanÄ±tÄ± GÃ¶nder';
+   const label=document.createElement('h3');label.textContent='Yan\u0131t Yaz';
+   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='Mesaj\u0131n\u0131 buraya yaz...';
+   const send=document.createElement('button');send.type='button';send.className='btn';send.textContent='Yan\u0131t\u0131 G\u00f6nder';
    const info=document.createElement('p');info.style.marginTop='10px';
-   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='YanÄ±t en az 2 karakter olmalÄ±.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='YanÄ±t gÃ¶nderilemedi: '+error.message;return;}btn.click();};
+   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='Yan\u0131t en az 2 karakter olmal\u0131.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='Yan\u0131t g\u00f6nderilemedi: '+error.message;return;}btn.click();};
    replyBox.append(label,textarea,send,info);detail.appendChild(replyBox);
   };
   list.appendChild(btn);
