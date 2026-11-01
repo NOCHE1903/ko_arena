@@ -622,6 +622,15 @@
                   </form></div></div>
                 <p id="koMarketLoadStatus" role="status" style="padding:5px 0 12px;color:#c5b99d"></p>
                 <div id="pazarListesi"></div>
+                <section id="koMarketDetail" class="panel-box" hidden style="display:none;margin-top:15px">
+                  <div class="panel-header">&#304;lan Detay&#305;</div>
+                  <div class="panel-body">
+                    <button type="button" id="koMarketBack" class="btn" style="margin-bottom:18px">&#8592; &#304;lanlara D&#246;n</button>
+                    <h2 id="koMarketDetailTitle" style="color:#f2d391;margin-bottom:12px"></h2>
+                    <p id="koMarketDetailMeta" style="color:#d9c9a8;margin-bottom:14px"></p>
+                    <p id="koMarketDetailDescription" style="white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere"></p>
+                  </div>
+                </section>
             </div>
 
             <!-- 3. &#199;ARK & ETK&#304;NL&#304;K B&#214;L&#220;M&#220; -->
@@ -1062,10 +1071,36 @@ const marketForm=document.getElementById('koMarketForm');
 const marketStatus=document.getElementById('koMarketStatus');
 const marketList=document.getElementById('pazarListesi');
 const marketLoadStatus=document.getElementById('koMarketLoadStatus');
+
+const marketDetail=document.getElementById('koMarketDetail');
+const marketBack=document.getElementById('koMarketBack');
+const marketFilters=document.querySelector('#pazarSec .filter-grid');
+function koCloseMarketDetail(){
+ marketDetail.hidden=true;marketDetail.style.display='none';
+ marketList.hidden=false;marketList.style.display='';
+ marketLoadStatus.hidden=false;
+ if(marketFilters)marketFilters.hidden=false;
+}
+function koOpenMarketDetail(ad){
+ document.getElementById('koMarketDetailTitle').textContent=ad.title;
+ document.getElementById('koMarketDetailMeta').textContent=
+  ad.server.toUpperCase()+' | '+(ad.item_type==='char'?'Karakter / Ring':'\u0130tem / GB')+
+  ' | '+Number(ad.price).toLocaleString('tr-TR')+' TL | '+
+  new Date(ad.created_at).toLocaleDateString('tr-TR');
+ document.getElementById('koMarketDetailDescription').textContent=ad.description;
+ marketList.hidden=true;marketList.style.display='none';
+ marketLoadStatus.hidden=true;
+ if(marketFilters)marketFilters.hidden=true;
+ marketDetail.hidden=false;marketDetail.style.display='block';
+ marketDetail.scrollIntoView({behavior:'smooth',block:'start'});
+}
+marketBack.addEventListener('click',koCloseMarketDetail);
+
 async function koLoadMarket(){
  if(!client)return;
  marketLoadStatus.textContent='\u0130lanlar y\u00fckleniyor...';
  const {data,error}=await client.from('ko_market_ads').select('id,user_id,title,description,server,item_type,price,created_at').order('created_at',{ascending:false}).limit(100);
+ koCloseMarketDetail();
  marketList.replaceChildren();
  if(error){marketLoadStatus.textContent='\u0130lanlar y\u00fcklenemedi. \u00d6nce verilen pazar SQL kurulumunu \u00e7al\u0131\u015ft\u0131r: '+error.message;return;}
  marketLoadStatus.textContent=data.length?'':'Hen\u00fcz ilan yok. \u0130lk ilan\u0131 sen a\u00e7abilirsin.';
@@ -1077,7 +1112,10 @@ async function koLoadMarket(){
   const content=document.createElement('div');const title=document.createElement('div');title.className='card-title';title.textContent=ad.title;
   const desc=document.createElement('div');desc.className='card-desc';desc.style.whiteSpace='pre-wrap';desc.textContent=ad.description;
   const price=document.createElement('div');price.style.color='#f2d391';price.style.marginTop='6px';price.textContent=Number(ad.price).toLocaleString('tr-TR')+' TL \u00b7 '+ad.server.toUpperCase();
-  content.append(title,desc,price);main.append(icon,content);card.append(main);
+  content.append(title,price);main.append(icon,content);card.append(main);
+  const view=document.createElement('button');view.type='button';view.className='btn';view.textContent='\u0130lan\u0131 G\u00f6r';view.addEventListener('click',()=>koOpenMarketDetail(ad));
+  card.append(view);
+  title.style.cursor='pointer';title.addEventListener('click',()=>koOpenMarketDetail(ad));
   if(user&&user.id===ad.user_id){const del=document.createElement('button');del.type='button';del.className='btn btn-red';del.textContent='\u0130lan\u0131 Sil';del.onclick=async()=>{if(!confirm('\u0130lan\u0131 silmek istiyor musun?'))return;const {error}=await client.from('ko_market_ads').delete().eq('id',ad.id);if(error)alert('\u0130lan silinemedi: '+error.message);else koLoadMarket();};card.append(del);}
   marketList.append(card);
  }
