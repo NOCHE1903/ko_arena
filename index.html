@@ -1011,12 +1011,35 @@
 #koAuthDialog h2{font-family:Cinzel,serif;color:#f4d995;margin-bottom:16px}#koAuthDialog label{display:block;font-size:12px;color:#e5d6b5;margin:12px 0 5px}
 #koAuthDialog input{display:block;width:100%;padding:11px;background:#080d11;color:white;border:1px solid #766441;border-radius:3px}#koAuthDialog .ko-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}
 #koAuthMessage{font-size:12px;line-height:1.5;margin-top:12px;color:#f1c97b;overflow-wrap:anywhere}
+
+/* KO ARENA profil menÃ¼sÃ¼ */
+.ko-user-menu{position:relative;display:flex;align-items:center;gap:8px}
+.ko-user-trigger{display:flex;align-items:center;gap:8px;text-transform:none;max-width:230px}
+.ko-user-trigger img{width:26px;height:26px;object-fit:cover;border-radius:50%;border:1px solid #b99b5a}
+.ko-user-dropdown{position:absolute;right:0;top:calc(100% + 8px);z-index:9999;width:205px;background:#111a20;border:1px solid #b99b5a;box-shadow:0 12px 35px #000c;border-radius:5px;padding:6px}
+.ko-user-dropdown[hidden]{display:none}.ko-user-dropdown button{display:block;width:100%;text-align:left;background:transparent;border:0;color:#f4d995;padding:12px;cursor:pointer;font-size:12px}
+.ko-user-dropdown button:hover{background:#2b302b}
+#koProfileOverlay{position:fixed;inset:0;background:#000d;z-index:100001;display:none;align-items:center;justify-content:center;padding:15px}
+#koProfileOverlay.ko-open{display:flex}#koProfileDialog{width:min(460px,100%);max-height:90vh;overflow:auto;background:#111a20;border:1px solid #b99b5a;border-radius:7px;padding:24px;box-shadow:0 15px 65px #000}
+#koProfileDialog h2{font-family:Cinzel,serif;color:#f4d995;margin-bottom:12px}#koProfileDialog label{display:block;color:#e5d6b5;font-size:12px;margin:13px 0 5px}
+#koProfileDialog input{width:100%;padding:11px;background:#080d11;color:#fff;border:1px solid #766441;border-radius:3px}
+#koProfileDialog .ko-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}#koProfileMessage{color:#f1c97b;font-size:12px;margin-top:12px;line-height:1.5;overflow-wrap:anywhere}
 </style>
 <div id="koAuthOverlay" role="presentation"><div id="koAuthDialog" role="dialog" aria-modal="true" aria-label="&#220;yelik i&#351;lemleri"><h2 id="koAuthHeading">Giri&#351; Yap</h2>
 <form id="koAuthForm"><div id="koUsernameWrap" hidden><label for="koUsername">Kullan&#305;c&#305; ad&#305;</label><input id="koUsername" name="username" minlength="3" maxlength="30" autocomplete="username"></div>
 <label for="koEmail">E-posta</label><input id="koEmail" name="email" type="email" required autocomplete="email">
 <label for="koPassword">&#350;ifre</label><input id="koPassword" name="password" type="password" minlength="6" required autocomplete="current-password">
 <div class="ko-actions"><button class="btn" id="koAuthSubmit" type="submit">Giri&#351; Yap</button><button class="btn btn-red" id="koAuthSwitch" type="button">Kay&#305;t Ol</button><button class="btn" id="koAuthClose" type="button">Kapat</button></div></form><p id="koAuthMessage" role="status"></p></div></div>
+
+<div id="koProfileOverlay"><div id="koProfileDialog" role="dialog" aria-modal="true" aria-label="Profil ayarlarÄ±">
+<h2>Profilim</h2><p id="koProfileInfo" style="color:#d4c4a3;font-size:12px;line-height:1.7"></p>
+<form id="koProfileForm"><label for="koProfileName">KullanÄ±cÄ± adÄ±</label><input id="koProfileName" minlength="3" maxlength="30" required autocomplete="nickname">
+<label for="koProfileAvatar">Profil fotoÄŸrafÄ± baÄŸlantÄ±sÄ± (isteÄŸe baÄŸlÄ±)</label><input id="koProfileAvatar" type="url" maxlength="500" placeholder="https://..." autocomplete="url">
+<div class="ko-actions"><button type="submit" class="btn">Profili Kaydet</button><button type="button" class="btn" id="koProfileClose">Kapat</button></div></form>
+<form id="koPasswordForm" style="margin-top:20px;padding-top:15px;border-top:1px solid #66563c"><h3 style="color:#f4d995;font-size:14px">Åifre DeÄŸiÅŸtir</h3>
+<label for="koNewPassword">Yeni ÅŸifre (en az 6 karakter)</label><input id="koNewPassword" type="password" minlength="6" required autocomplete="new-password">
+<div class="ko-actions"><button type="submit" class="btn">Åifreyi GÃ¼ncelle</button></div></form>
+<p id="koProfileMessage" role="status"></p></div></div>
 <script>
 (function(){
 'use strict';
@@ -1033,7 +1056,67 @@ window.koOpenAuth=function(mode){signup=!!mode;document.getElementById('koAuthHe
 document.getElementById('koAuthClose').onclick=()=>overlay.classList.remove('ko-open');
 document.getElementById('koAuthSwitch').onclick=()=>window.koOpenAuth(!signup);
 overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('ko-open');});
-async function renderUser(){if(!client)return;const {data:{user}}=await client.auth.getUser();authBox.replaceChildren();if(user){const name=document.createElement('span');name.style.cssText='align-self:center;color:#f4d995;font-size:12px';name.textContent=user.user_metadata?.username||user.email||'\u00dcye';const logout=document.createElement('button');logout.className='btn btn-red';logout.textContent='\u00c7\u0131k\u0131\u015f Yap';logout.onclick=async()=>{const {error}=await client.auth.signOut();if(error)alert(error.message);else renderUser();};authBox.append(name,logout);}else{for(const [label,mode] of [['Giri\u015f Yap',false],['Kay\u0131t Ol',true]]){const btn=document.createElement('button');btn.className=mode?'btn btn-red':'btn';btn.textContent=label;btn.onclick=()=>window.koOpenAuth(mode);authBox.append(btn);}}}
+const profileOverlay=document.getElementById('koProfileOverlay');
+const profileMessage=document.getElementById('koProfileMessage');
+const profileName=document.getElementById('koProfileName');
+const profileAvatar=document.getElementById('koProfileAvatar');
+let profileExp=null;
+const rankFor=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'GÃ¼mÃ¼ÅŸ':exp>=500?'Bronz':exp>=100?'Ã‡aylak':'Yeni Ãœye';
+async function openProfile(focusPassword=false){
+ if(!client)return;
+ const {data:{user},error}=await client.auth.getUser();if(error||!user){window.koOpenAuth(false);return;}
+ profileMessage.textContent='';profileName.value=user.user_metadata?.username||user.email?.split('@')[0]||'';
+ profileAvatar.value=user.user_metadata?.avatar_url||'';
+ const {data:row}=await client.from('profiles').select('username,exp').eq('id',user.id).maybeSingle();
+ if(row){if(row.username)profileName.value=row.username;profileExp=row.exp;}
+ else profileExp=null;
+ const {data:forumRow}=await client.from('forum_profiles').select('avatar_url').eq('user_id',user.id).maybeSingle();
+ if(forumRow?.avatar_url)profileAvatar.value=forumRow.avatar_url;
+ document.getElementById('koProfileInfo').textContent='E-posta: '+user.email+(profileExp!==null?' | EXP: '+profileExp+' | RÃ¼tbe: '+rankFor(profileExp):'');
+ profileOverlay.classList.add('ko-open');if(focusPassword)document.getElementById('koNewPassword').focus();
+}
+document.getElementById('koProfileClose').onclick=()=>profileOverlay.classList.remove('ko-open');
+profileOverlay.addEventListener('click',e=>{if(e.target===profileOverlay)profileOverlay.classList.remove('ko-open');});
+document.getElementById('koProfileForm').onsubmit=async e=>{
+ e.preventDefault();const {data:{user}}=await client.auth.getUser();if(!user)return;
+ const username=profileName.value.trim(),avatar_url=profileAvatar.value.trim();
+ if(username.length<3){profileMessage.textContent='KullanÄ±cÄ± adÄ± en az 3 karakter olmalÄ±.';return;}
+ const button=e.submitter;if(button)button.disabled=true;profileMessage.textContent='Kaydediliyor...';
+ try{
+  const {error:authError}=await client.auth.updateUser({data:{username,avatar_url}});if(authError)throw authError;
+  const {error:profileError}=await client.from('profiles').update({username}).eq('id',user.id);
+  const {error:forumError}=await client.from('forum_profiles').update({display_name:username,avatar_url:avatar_url||null}).eq('user_id',user.id);
+  await renderUser();
+  profileMessage.textContent=profileError||forumError?'Hesap bilgileri kaydedildi; forum profilinin tamamÄ± gÃ¼ncellenemedi. VeritabanÄ± izinleri kontrol edilmeli.':'Profil gÃ¼ncellendi!';
+ }catch(err){profileMessage.textContent='Kaydedilemedi: '+(err.message||'Bilinmeyen hata');}finally{if(button)button.disabled=false;}
+};
+document.getElementById('koPasswordForm').onsubmit=async e=>{
+ e.preventDefault();const button=e.submitter;if(button)button.disabled=true;
+ profileMessage.textContent='Åifre gÃ¼ncelleniyor...';
+ try{const {error}=await client.auth.updateUser({password:document.getElementById('koNewPassword').value});if(error)throw error;document.getElementById('koNewPassword').value='';profileMessage.textContent='Åifre gÃ¼ncellendi.';}
+ catch(err){profileMessage.textContent='Åifre gÃ¼ncellenemedi: '+(err.message||'Bilinmeyen hata');}finally{if(button)button.disabled=false;}
+};
+async function renderUser(){
+ if(!client)return;const {data:{user}}=await client.auth.getUser();authBox.replaceChildren();
+ if(user){
+  const wrap=document.createElement('div');wrap.className='ko-user-menu';
+  const trigger=document.createElement('button');trigger.type='button';trigger.className='btn ko-user-trigger';
+  const avatar=user.user_metadata?.avatar_url;
+  if(avatar&&/^https:\/\//i.test(avatar)){const img=document.createElement('img');img.src=avatar;img.alt='';img.referrerPolicy='no-referrer';trigger.appendChild(img);}
+  const name=document.createElement('span');name.textContent=user.user_metadata?.username||user.email||'Ãœye';trigger.appendChild(name);
+  const arrow=document.createElement('i');arrow.className='fa-solid fa-chevron-down';trigger.appendChild(arrow);
+  const menu=document.createElement('div');menu.className='ko-user-dropdown';menu.hidden=true;
+  trigger.setAttribute('aria-expanded','false');trigger.onclick=()=>{menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden));};
+  for(const [label,action] of [['Profilim',()=>openProfile()],['Profili DÃ¼zenle',()=>openProfile()],['Åifre DeÄŸiÅŸtir',()=>openProfile(true)],['Ã‡Ä±kÄ±ÅŸ Yap',async()=>{const {error}=await client.auth.signOut();if(error)alert(error.message);else{profileOverlay.classList.remove('ko-open');renderUser();}}]]){
+   const item=document.createElement('button');item.type='button';item.textContent=label;item.onclick=()=>{menu.hidden=true;action();};menu.appendChild(item);
+  }
+  wrap.append(trigger,menu);authBox.appendChild(wrap);
+  document.addEventListener('click',e=>{if(!wrap.contains(e.target))menu.hidden=true;},{signal:menuAbortSignal()});
+ }else{for(const [label,mode] of [['GiriÅŸ Yap',false],['KayÄ±t Ol',true]]){const btn=document.createElement('button');btn.className=mode?'btn btn-red':'btn';btn.textContent=label;btn.onclick=()=>window.koOpenAuth(mode);authBox.append(btn);}}
+}
+let menuController;
+function menuAbortSignal(){if(menuController)menuController.abort();menuController=new AbortController();return menuController.signal;}
+
 form.onsubmit=async e=>{e.preventDefault();if(!client){message.textContent='Ba\u011flant\u0131 k\u00fct\u00fcphanesi y\u00fcklenemedi. \u0130nternet ba\u011flant\u0131n\u0131z\u0131 kontrol edin.';return;}const btn=document.getElementById('koAuthSubmit');btn.disabled=true;message.textContent='\u0130\u015flem yap\u0131l\u0131yor...';try{const email=form.email.value.trim();const password=form.password.value;let result;if(signup){const username=document.getElementById('koUsername').value.trim();if(username.length<3)throw Error('Kullan\u0131c\u0131 ad\u0131 en az 3 karakter olmal\u0131.');result=await client.auth.signUp({email,password,options:{data:{username},emailRedirectTo:'https://noche1903.github.io/ko_arena/'}});}else result=await client.auth.signInWithPassword({email,password});if(result.error)throw result.error;if(signup&&!result.data.session){message.textContent='Kay\u0131t al\u0131nd\u0131. E-posta do\u011frulama ba\u011flant\u0131s\u0131n\u0131 kontrol et.';}else{overlay.classList.remove('ko-open');form.reset();await renderUser();}}catch(err){message.textContent=err.message||'\u0130\u015flem ba\u015far\u0131s\u0131z.';}finally{btn.disabled=false;}};
 if(client){client.auth.onAuthStateChange(()=>setTimeout(renderUser,0));renderUser();}else message.textContent='Supabase y\u00fcklenemedi.';
 })();
