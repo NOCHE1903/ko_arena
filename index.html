@@ -1164,6 +1164,28 @@ document.addEventListener('DOMContentLoaded',koPopulateServerForums);
 #koTopicStatus{font-size:12px;color:#f1c97b;margin-top:12px;line-height:1.5}
 .ko-real-topic{width:100%;text-align:left;display:block;border:0;border-bottom:1px solid #354044;background:transparent;color:#f2e5c9;padding:14px 16px;cursor:pointer}
 .ko-real-topic:hover{background:#29332e}.ko-delete-topic{margin:10px 0;background:#632820;color:#fff;border:1px solid #b65b50;border-radius:3px;padding:9px 12px;cursor:pointer}.ko-delete-topic[hidden]{display:none}.ko-real-topic small{display:block;color:#aeb2ae;margin-top:5px}
+
+/* ForumTR-inspired topic layout */
+#koTopicDetail{padding:0;background:#0e171b;border:1px solid #92764a}
+.ko-topic-head{padding:16px 18px;background:#192329;border-bottom:1px solid #79643b}
+#koTopicDetail .ko-topic-head h2{margin:12px 0 4px;font-size:20px;color:#f4d48c}
+.ko-topic-post{display:grid;grid-template-columns:210px minmax(0,1fr);border-bottom:1px solid #554a35;min-height:215px}
+.ko-post-profile{padding:18px 14px;background:#182329;border-right:1px solid #635237;overflow-wrap:anywhere}
+.ko-post-profile img{display:block;width:92px;height:92px;object-fit:cover;border:2px solid #aa8a51;border-radius:5px;margin:12px auto}
+.ko-post-profile .ko-avatar-fallback{display:grid;place-items:center;width:92px;height:92px;background:#28343a;border:2px solid #aa8a51;border-radius:5px;margin:12px auto;font-size:38px;color:#e7bd67}
+.ko-post-profile strong{display:block;color:#f2d391;font-size:15px;text-align:center}
+.ko-post-profile .ko-rank{display:block;color:#d8b76c;text-align:center;font-size:12px;margin:7px 0 12px}
+.ko-post-profile .ko-stats{border-top:1px solid #5c4b30;padding-top:10px;color:#c6bca8;font-size:11px;line-height:2}
+.ko-post-message{padding:16px 18px;display:flex;flex-direction:column;min-width:0}
+.ko-post-date{color:#aa9d85;font-size:11px;border-bottom:1px solid #3f423a;padding-bottom:10px}
+.ko-post-text{white-space:pre-wrap;overflow-wrap:anywhere;color:#f1e8d8;font-size:14px;line-height:1.8;padding:17px 0;flex:1}
+.ko-post-actions{border-top:1px solid #4c4738;padding-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+.ko-post-actions button{border:1px solid #78613c;background:#28271e;color:#efd39b;padding:8px 12px;border-radius:3px;cursor:pointer}
+.ko-post-actions .ko-delete-topic{margin:0;background:#632820;color:#fff;border-color:#b65b50}
+.ko-reply-box{padding:18px;background:#141e22}
+.ko-reply-box textarea{width:100%;min-height:100px;padding:12px;background:#080e12;border:1px solid #766441;color:#fff;border-radius:4px;resize:vertical;margin:10px 0}
+.ko-reply-box h3{color:#f2d391;font-size:15px}
+@media(max-width:600px){.ko-topic-post{grid-template-columns:125px minmax(0,1fr)}.ko-post-profile{padding:12px 7px}.ko-post-message{padding:12px 10px}.ko-post-profile img,.ko-post-profile .ko-avatar-fallback{width:65px;height:65px}.ko-post-profile strong{font-size:12px}}
 </style>
 <div id="koTopicModal" role="presentation"><div class="ko-topic-form-box" role="dialog" aria-modal="true" aria-label="Yeni konu olu&#351;tur">
 <h2>Yeni Konu A&#231;</h2>
@@ -1244,7 +1266,56 @@ async function loadTopics(){
   const heading=document.createElement('strong');heading.textContent=t.title;
   const small=document.createElement('small');small.textContent='A\u00e7an: '+name+' \u00b7 '+new Date(t.created_at).toLocaleDateString('tr-TR')+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'');
   btn.append(heading,small);
-  btn.onclick=()=>{openKoTopic(t.title,name,t.content);const detail=document.getElementById('koTopicDetail');let del=detail.querySelector('.ko-delete-topic');if(!del){del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent='Konuyu Sil';detail.appendChild(del);}del.hidden=!(currentUser&&(isAdmin||currentUser.id===t.user_id));del.onclick=async()=>{if(!confirm('Bu konuyu kalÄ±cÄ± olarak silmek istiyor musun?'))return;del.disabled=true;const {error:deleteError}=await db.from('topics').delete().eq('id',t.id);del.disabled=false;if(deleteError){alert('Silme izni veya baÄŸlantÄ± hatasÄ±: '+deleteError.message);return;}detail.hidden=true;document.querySelectorAll('.forum-tab-panel').forEach(el=>el.hidden=false);if(typeof showForumTab==='function')showForumTab(tab);loadTopics();};document.getElementById('koTopicAuthor').textContent='Konuyu a\u00e7an: '+name+' \u00b7 Konu \u00f6d\u00fcl\u00fc: +100 EXP'+(typeof author.exp==='number'?' \u00b7 Toplam EXP: '+author.exp:'')+(rank?' \u00b7 R\u00fctbe: '+rank:'')+' \u00b7 '+new Date(t.created_at).toLocaleString('tr-TR');};
+  btn.onclick=async()=>{
+   openKoTopic(t.title,name,t.content);
+   const detail=document.getElementById('koTopicDetail');
+   detail.replaceChildren();
+   const head=document.createElement('div');head.className='ko-topic-head';
+   const back=document.createElement('button');back.type='button';back.className='btn';back.textContent='â† Konulara DÃ¶n';back.onclick=closeKoTopic;
+   const title=document.createElement('h2');title.textContent=t.title;
+   head.append(back,title);detail.appendChild(head);
+   const addPost=(text,person,when,canDelete,deleteAction,number)=>{
+    const post=document.createElement('article');post.className='ko-topic-post';
+    const left=document.createElement('aside');left.className='ko-post-profile';
+    const username=document.createElement('strong');username.textContent=person.name||'Ãœye';left.appendChild(username);
+    if(person.avatar_url){const avatar=document.createElement('img');avatar.src=person.avatar_url;avatar.alt='Profil fotoÄŸrafÄ±';avatar.onerror=()=>{avatar.remove();};left.appendChild(avatar);}
+    else {const fallback=document.createElement('div');fallback.className='ko-avatar-fallback';fallback.textContent='â™™';left.appendChild(fallback);}
+    const rankEl=document.createElement('span');rankEl.className='ko-rank';rankEl.textContent=rankOf(person.exp);left.appendChild(rankEl);
+    const stats=document.createElement('div');stats.className='ko-stats';stats.textContent='Toplam EXP: '+(person.exp??0);if(person.created_at)stats.appendChild(document.createTextNode(' Â· KayÄ±t: '+new Date(person.created_at).toLocaleDateString('tr-TR')));left.appendChild(stats);
+    const right=document.createElement('div');right.className='ko-post-message';
+    const date=document.createElement('div');date.className='ko-post-date';date.textContent=new Date(when).toLocaleString('tr-TR')+' Â· #'+number;
+    const body=document.createElement('div');body.className='ko-post-text';body.textContent=text;
+    const actions=document.createElement('div');actions.className='ko-post-actions';
+    const reply=document.createElement('button');reply.type='button';reply.textContent='YanÄ±tla';reply.onclick=()=>{document.getElementById('koReplyText')?.focus();};actions.appendChild(reply);
+    if(canDelete){const del=document.createElement('button');del.type='button';del.className='ko-delete-topic';del.textContent=number===1?'Konuyu Sil':'YanÄ±tÄ± Sil';del.onclick=deleteAction;actions.appendChild(del);}
+    right.append(date,body,actions);post.append(left,right);detail.appendChild(post);
+   };
+   const rankOf=exp=>exp>=50000?'Emektar':exp>=35000?'Efsane':exp>=20000?'Usta':exp>=10000?'Elmas':exp>=5000?'Platin':exp>=2500?'Gold':exp>=1000?'GÃ¼mÃ¼ÅŸ':exp>=500?'Bronz':exp>=100?'Ã‡aylak':'Yeni Ãœye';
+   const allIds=[t.user_id];
+   const {data:comments,error:commentError}=await db.from('comments').select('id,topic_id,user_id,content,created_at').eq('topic_id',t.id).order('created_at',{ascending:true});
+   if(!commentError)allIds.push(...(comments||[]).map(c=>c.user_id));
+   const people=new Map();
+   const {data:ps}=await db.from('profiles').select('id,username,exp,created_at').in('id',[...new Set(allIds.filter(Boolean))]);
+   for(const p of ps||[])people.set(p.id,{name:p.username,exp:p.exp,created_at:p.created_at});
+   const {data:fps}=await db.from('forum_profiles').select('user_id,display_name,avatar_url').in('user_id',[...new Set(allIds.filter(Boolean))]);
+   for(const p of fps||[]){const prev=people.get(p.user_id)||{};people.set(p.user_id,{...prev,name:prev.name||p.display_name,avatar_url:p.avatar_url});}
+   const authorPerson={...people.get(t.user_id),name:people.get(t.user_id)?.name||name,exp:people.get(t.user_id)?.exp??author.exp};
+   const deleteTopic=async()=>{if(!confirm('Konuyu kalÄ±cÄ± olarak silmek istiyor musun?'))return;const {error}=await db.from('topics').delete().eq('id',t.id);if(error){alert('Silinemedi: '+error.message);return;}closeKoTopic();loadTopics();};
+   addPost(t.content,authorPerson,t.created_at,!!(currentUser&&(isAdmin||currentUser.id===t.user_id)),deleteTopic,1);
+   if(commentError){const err=document.createElement('p');err.textContent='YanÄ±tlar yÃ¼klenemedi: '+commentError.message;detail.appendChild(err);}
+   else for(let i=0;i<(comments||[]).length;i++){
+    const c=comments[i];const person=people.get(c.user_id)||{name:'Ãœye'};
+    const delComment=async()=>{if(!confirm('YanÄ±tÄ± silmek istiyor musun?'))return;const {error}=await db.from('comments').delete().eq('id',c.id);if(error){alert('Silinemedi: '+error.message);return;}btn.click();};
+    addPost(c.content,person,c.created_at,!!(currentUser&&(isAdmin||currentUser.id===c.user_id)),delComment,i+2);
+   }
+   const replyBox=document.createElement('div');replyBox.className='ko-reply-box';
+   const label=document.createElement('h3');label.textContent='YanÄ±t Yaz';
+   const textarea=document.createElement('textarea');textarea.id='koReplyText';textarea.placeholder='MesajÄ±nÄ± buraya yaz...';
+   const send=document.createElement('button');send.type='button';send.className='btn';send.textContent='YanÄ±tÄ± GÃ¶nder';
+   const info=document.createElement('p');info.style.marginTop='10px';
+   send.onclick=async()=>{if(!currentUser){window.koOpenAuth?.(false);return;}const content=textarea.value.trim();if(content.length<2){info.textContent='YanÄ±t en az 2 karakter olmalÄ±.';return;}send.disabled=true;const {error}=await db.from('comments').insert({topic_id:t.id,user_id:currentUser.id,content});send.disabled=false;if(error){info.textContent='YanÄ±t gÃ¶nderilemedi: '+error.message;return;}btn.click();};
+   replyBox.append(label,textarea,send,info);detail.appendChild(replyBox);
+  };
   list.appendChild(btn);
  }
 }
