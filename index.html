@@ -1144,8 +1144,85 @@ if(client){client.auth.onAuthStateChange(()=>setTimeout(renderUser,0));renderUse
 const koForumServers=['Zero','Agartha'];
 function koPopulateServerForums(){const el=document.getElementById('koServerForumSelect');if(!el)return;for(const name of koForumServers){const opt=document.createElement('option');opt.value=name.toLowerCase();opt.textContent='Server: '+name;el.appendChild(opt);}}
 function koSelectServerForum(value){if(!value)return;showForumTab(value);}
-function koOpenNewTopic(){alert('Yeni konu oluÅŸturma henÃ¼z veritabanÄ±na baÄŸlÄ± deÄŸil. Bir sonraki adÄ±mda gerÃ§ek konu oluÅŸturma formunu kuracaÄŸÄ±z.');}
+// Konu aÃ§ma penceresi aÅŸaÄŸÄ±daki Supabase modÃ¼lÃ¼nden aÃ§Ä±lÄ±r.
 document.addEventListener('DOMContentLoaded',koPopulateServerForums);
+</script>
+
+<style>
+#koTopicModal{position:fixed;inset:0;z-index:100100;background:#000d;display:none;align-items:center;justify-content:center;padding:16px}
+#koTopicModal.ko-open{display:flex}
+#koTopicModal .ko-topic-form-box{background:#111a20;border:1px solid #b99b5a;border-radius:6px;width:min(570px,100%);max-height:92vh;overflow:auto;padding:24px;box-shadow:0 18px 60px #000c}
+#koTopicModal h2{font:700 21px Cinzel,serif;color:#f4d995;margin-bottom:16px}
+#koTopicModal label{display:block;color:#e5d6b5;font-size:12px;margin:12px 0 5px}
+#koTopicModal input,#koTopicModal textarea,#koTopicModal select{width:100%;padding:11px;border:1px solid #766441;border-radius:3px;background:#080d11;color:#fff;font:13px Inter,sans-serif}
+#koTopicModal textarea{resize:vertical;min-height:155px}
+#koTopicModal .ko-topic-buttons{display:flex;gap:9px;margin-top:16px}
+#koTopicStatus{font-size:12px;color:#f1c97b;margin-top:12px;line-height:1.5}
+.ko-real-topic{width:100%;text-align:left;display:block;border:0;border-bottom:1px solid #354044;background:transparent;color:#f2e5c9;padding:14px 16px;cursor:pointer}
+.ko-real-topic:hover{background:#29332e}.ko-real-topic small{display:block;color:#aeb2ae;margin-top:5px}
+</style>
+<div id="koTopicModal" role="presentation"><div class="ko-topic-form-box" role="dialog" aria-modal="true" aria-label="Yeni konu oluÅŸtur">
+<h2>Yeni Konu AÃ§</h2>
+<form id="koTopicForm"><label for="koTopicCategory">Forum kategorisi / Sunucu</label><select id="koTopicCategory" required><option value="">Kategoriler yÃ¼kleniyor...</option></select>
+<label for="koTopicNewTitle">Konu baÅŸlÄ±ÄŸÄ±</label><input id="koTopicNewTitle" required minlength="5" maxlength="150" placeholder="Konu baÅŸlÄ±ÄŸÄ±nÄ± yaz">
+<label for="koTopicNewContent">Konu iÃ§eriÄŸi</label><textarea id="koTopicNewContent" required minlength="10" maxlength="20000" placeholder="Konunu buraya yaz..."></textarea>
+<div class="ko-topic-buttons"><button class="btn" type="submit" id="koTopicSubmit">Konuyu YayÄ±nla</button><button class="btn" type="button" id="koTopicCancel">Kapat</button></div>
+<p id="koTopicStatus" role="status"></p></form></div></div>
+<script>
+(function(){
+'use strict';
+const modal=document.getElementById('koTopicModal'),form=document.getElementById('koTopicForm'),category=document.getElementById('koTopicCategory'),status=document.getElementById('koTopicStatus');
+const client=()=>window.koSupabase;
+let categories=[];
+function categoryName(c){return String(c.name??c.title??c.ad??c.category_name??('Kategori '+c.id));}
+function tabFor(name){const n=name.toLocaleLowerCase('tr-TR');if(n.includes('duyuru'))return 'duyurular';if(n.includes('genel')||n.includes('knight online'))return 'cz';if(n.includes('zero'))return 'zero';if(n.includes('agartha'))return 'agartha';return null;}
+async function loadCategories(){
+ const db=client();if(!db)throw Error('VeritabanÄ± baÄŸlantÄ±sÄ± kurulamadÄ±.');
+ const {data,error}=await db.from('categories').select('*').order('id',{ascending:true});if(error)throw error;
+ categories=(data||[]).filter(c=>c.id!=null);
+ category.replaceChildren();const empty=document.createElement('option');empty.value='';empty.textContent='Kategori seÃ§';category.appendChild(empty);
+ for(const c of categories){const option=document.createElement('option');option.value=String(c.id);option.textContent=categoryName(c);category.appendChild(option);}
+ if(!categories.length)status.textContent='HenÃ¼z veritabanÄ±nda kategori yok. Ã–nce categories tablosuna kategori eklenmeli.';
+}
+window.koOpenNewTopic=async function(){
+ const db=client();if(!db){alert('Supabase baÄŸlantÄ±sÄ± kurulamadÄ±.');return;}
+ const {data:{user}}=await db.auth.getUser();if(!user){window.koOpenAuth?.(false);return;}
+ status.textContent='';modal.classList.add('ko-open');
+ try{await loadCategories();const selected=document.querySelector('[data-forum-tab].active')?.dataset.forumTab;
+ const match=categories.find(c=>tabFor(categoryName(c))===selected);if(match)category.value=String(match.id);
+ }catch(e){status.textContent='Kategoriler alÄ±namadÄ±: '+e.message;}
+};
+function close(){modal.classList.remove('ko-open');}
+document.getElementById('koTopicCancel').onclick=close;
+modal.addEventListener('click',e=>{if(e.target===modal)close();});
+form.addEventListener('submit',async e=>{
+ e.preventDefault();const db=client();const button=document.getElementById('koTopicSubmit');button.disabled=true;status.textContent='Konu kaydediliyor...';
+ try{
+ const {data:{user},error:authError}=await db.auth.getUser();if(authError||!user)throw Error('Ã–nce giriÅŸ yapmalÄ±sÄ±n.');
+ const title=document.getElementById('koTopicNewTitle').value.trim(),content=document.getElementById('koTopicNewContent').value.trim();
+ if(title.length<5||content.length<10||!category.value)throw Error('Kategori, en az 5 karakter baÅŸlÄ±k ve 10 karakter iÃ§erik gerekli.');
+ const selectedCategory=categories.find(c=>String(c.id)===category.value);
+ const {error}=await db.from('topics').insert({category_id:Number(category.value),user_id:user.id,title,content});if(error)throw error;
+ status.textContent='Konu baÅŸarÄ±yla yayÄ±nlandÄ±!';const target=selectedCategory&&tabFor(categoryName(selectedCategory));
+ form.reset();setTimeout(()=>{close();if(target&&typeof showForumTab==='function')showForumTab(target);loadTopics();},650);
+ }catch(err){status.textContent='Konu kaydedilemedi: '+(err.message||'Bilinmeyen hata');}finally{button.disabled=false;}
+});
+async function loadTopics(){
+ const db=client();if(!db)return;
+ const {data:cats,error:catError}=await db.from('categories').select('*');if(catError)return;
+ const {data:topics,error}=await db.from('topics').select('id,category_id,title,content,created_at,user_id').order('created_at',{ascending:false}).limit(100);if(error)return;
+ document.querySelectorAll('.ko-dynamic-topics').forEach(el=>el.remove());
+ for(const t of topics||[]){const cat=(cats||[]).find(c=>String(c.id)===String(t.category_id));if(!cat)continue;
+ const tab=tabFor(categoryName(cat));if(!tab)continue;
+ const panel=document.querySelector('[data-forum-panel="'+tab+'"] .forum-category-list');if(!panel)continue;
+ let list=panel.querySelector('.ko-dynamic-topics');if(!list){list=document.createElement('div');list.className='ko-dynamic-topics';panel.appendChild(list);}
+ const btn=document.createElement('button');btn.type='button';btn.className='ko-real-topic';
+ const heading=document.createElement('strong');heading.textContent=t.title;const small=document.createElement('small');small.textContent='Ãœye konusu Â· '+new Date(t.created_at).toLocaleDateString('tr-TR');
+ btn.append(heading,small);btn.onclick=()=>openKoTopic(t.title,'Ãœye',t.content);list.appendChild(btn);
+ }
+}
+document.addEventListener('DOMContentLoaded',loadTopics);
+})();
 </script>
 </body>
 </html>
